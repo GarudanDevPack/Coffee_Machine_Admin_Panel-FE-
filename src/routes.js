@@ -12,6 +12,10 @@ const SalesReportings = React.lazy(() => import('./views/pages/nav/Sales'))
 const PushNotificatons = React.lazy(() => import('./views/pages/nav/Notification'))
 const MachineAlerts = React.lazy(() => import('./views/pages/nav/Alert'))
 const Promotions = React.lazy(() => import('./views/pages/nav/Promotion'))
+const Items = React.lazy(() => import('./views/pages/nav/Items'))
+const ItemTypes = React.lazy(() => import('./views/pages/nav/categories/ItemType'))
+const AlertTypes = React.lazy(() => import('./views/pages/nav/categories/AlertType'))
+const NotificationTypes = React.lazy(() => import('./views/pages/nav/categories/NotificationType'))
 
 const AddMachineModal = React.lazy(() =>
   import('./views/modal/AddComponentModel').then((module) => ({ default: module.AddMachineModal })),
@@ -50,11 +54,27 @@ const AddNotificationModal = React.lazy(() =>
 const AddAlertModal = React.lazy(() =>
   import('./views/modal/AddComponentModel').then((module) => ({
     default: module.AddAlertModal,
-  })),
+  }))
 )
 const AddPromotionsModal = React.lazy(() =>
   import('./views/modal/AddComponentModel').then((module) => ({
     default: module.AddPromotionModal,
+  })),
+)
+
+const AddItemTypeModal = React.lazy(() =>
+  import('./views/modal/AddComponentModel').then((module) => ({
+    default: module.AddItemTypeModal,
+  })),
+)
+const AddAlertTypeModal = React.lazy(() =>
+  import('./views/modal/AddComponentModel').then((module) => ({
+    default: module.AddAlertTypeModal,
+  })),
+)
+const AddNotificationTypeModal = React.lazy(() =>
+  import('./views/modal/AddComponentModel').then((module) => ({
+    default: module.AddAlertTypeModal,
   })),
 )
 // const AddMachineModal = React.lazy(() => import('./views/modal/AddComponentModel'))
@@ -121,6 +141,12 @@ const routes = [
   { path: '/pages/nav/pushnotifications', name: 'PushNotificatons', element: PushNotificatons },
   { path: '/pages/nav/machinealerts', name: 'MachineAlerts', element: MachineAlerts },
   { path: '/pages/nav/promotions', name: 'Promotions', element: Promotions },
+  { path: '/pages/nav/items', name: 'Items', element: Items },
+
+   { path: '/categories', name: 'Categories', element: Cards, exact: true },
+  { path: '/categories/itemtypes', name: 'Item Types', element: ItemTypes },
+  { path: '/categories/alerttypes', name: 'Alert Types', element: AlertTypes },
+  { path: '/categories/notificationtypes', name: 'Notification Types', element: NotificationTypes },
 
   { path: '/modal/addmachinemodal', name: 'AddMachineModal', element: AddMachineModal },
   { path: '/modal/addcustomermodal', name: 'AddCustomerModal', element: AddCustomerModal },
@@ -128,11 +154,21 @@ const routes = [
   { path: '/modal/addbrewstockmodal', name: 'AddBrewStockModal', element: AddBrewStockModal },
   { path: '/modal/addcustomerwalletmodal', name: 'AddCustomerWalletModal', element: AddCustomerWalletModal },
   { path: '/modal/viewsalesrepotingmodal', name: 'ViewSalesRepotingModal', element: ViewSalesRepotingModal },//ViewSalesRepotingModal
-  { path: '/modal/addnotificationmodal', name: 'AddNotificationModal', element: AddNotificationModal },//ViewSalesRepotingModal
-  { path: '/modal/addalertmodal', name: 'AddAlertModal', element: AddAlertModal },//ViewSalesRepotingModal
-  { path: '/modal/addpromotionsmodal', name: 'AddPromotionsModal', element: AddPromotionsModal },//ViewSalesRepotingModal
+  { path: '/modal/addnotificationmodal', name: 'AddNotificationModal', element: AddNotificationModal },
+  { path: '/modal/addalertmodal', name: 'AddAlertModal', element: AddAlertModal },
+  { path: '/modal/addpromotionsmodal', name: 'AddPromotionsModal', element: AddPromotionsModal },
+  { path: '/modal/additemtypemodal', name: 'AddItemTypeModal', element: AddItemTypeModal },
+  { path: '/modal/addalerttypemodal', name: 'AddAlertTypeModal', element: AddAlertTypeModal },
+  { path: '/modal/addnotificationtypemodal', name: 'AddNotificationTypeModal', element: AddNotificationTypeModal },
+
+
+  { path: '/items', name: 'Base', element: Cards, exact: true },
+  { path: '/items/accordion', name: 'Accordion', element: Accordion },
+  { path: '/items/breadcrumbs', name: 'Breadcrumbs', element: Breadcrumbs },
 
   { path: '/theme/typography', name: 'Typography', element: Typography },
+  
+
   { path: '/base', name: 'Base', element: Cards, exact: true },
   { path: '/base/accordion', name: 'Accordion', element: Accordion },
   { path: '/base/breadcrumbs', name: 'Breadcrumbs', element: Breadcrumbs },

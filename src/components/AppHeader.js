@@ -85,11 +85,11 @@ const AppHeader = () => {
           <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
           </li>
-          {/* <CDropdown variant="nav-item" placement="bottom-end">
+          <CDropdown variant="nav-item" placement="bottom-end">
             <CDropdownToggle caret={false}>
-              {colorMode === 'dark' ? (
+              {colorMode === 'light' ? (
                 <CIcon icon={cilMoon} size="lg" />
-              ) : colorMode === 'auto' ? (
+              ) : colorMode === 'light' ? (
                 <CIcon icon={cilContrast} size="lg" />
               ) : (
                 <CIcon icon={cilSun} size="lg" />
@@ -105,7 +105,7 @@ const AppHeader = () => {
               >
                 <CIcon className="me-2" icon={cilSun} size="lg" /> Light
               </CDropdownItem>
-              <CDropdownItem
+              {/* <CDropdownItem
                 active={colorMode === 'dark'}
                 className="d-flex align-items-center"
                 as="button"
@@ -113,8 +113,8 @@ const AppHeader = () => {
                 onClick={() => setColorMode('dark')}
               >
                 <CIcon className="me-2" icon={cilMoon} size="lg" /> Dark
-              </CDropdownItem>
-              <CDropdownItem
+              </CDropdownItem> */}
+              {/* <CDropdownItem
                 active={colorMode === 'auto'}
                 className="d-flex align-items-center"
                 as="button"
@@ -122,9 +122,9 @@ const AppHeader = () => {
                 onClick={() => setColorMode('auto')}
               >
                 <CIcon className="me-2" icon={cilContrast} size="lg" /> Auto
-              </CDropdownItem>
+              </CDropdownItem> */}
             </CDropdownMenu>
-          </CDropdown> */}
+          </CDropdown>
           {/* <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
           </li> */}

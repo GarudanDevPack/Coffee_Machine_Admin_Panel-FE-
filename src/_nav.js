@@ -21,6 +21,9 @@ import {
   cilNewspaper,
   cilAudioDescription,
   cilPuzzle,
+  cilStream,
+  cilMug,
+  cilMugTea,
   cilSpeedometer,
   cilStar,
 } from '@coreui/icons'
@@ -36,22 +39,6 @@ const _nav = [
     //   color: 'info',
     //   text: 'NEW',
     // },
-  },
-  {
-    component: CNavTitle,
-    name: 'User Manage',
-  },
-  {
-    component: CNavItem,
-    name: 'Manage Customers',
-    to: '/pages/nav/customers',
-    icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Manage Merchant',
-    to: '/pages/nav/merchants',
-    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
@@ -85,6 +72,58 @@ const _nav = [
     to: '/pages/nav/salesreportings',
     icon: <CIcon icon={cilMoney} customClassName="nav-icon" />,
   },
+  //user manage
+  {
+    component: CNavTitle,
+    name: 'User Manage',
+  },
+  {
+    component: CNavItem,
+    name: 'Manage Customers',
+    to: '/pages/nav/customers',
+    icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Manage Merchant',
+    to: '/pages/nav/merchants',
+    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+  },
+  //group content
+  {
+    component: CNavTitle,
+    name: 'Components',
+  },
+  {
+    component: CNavItem,
+    name: 'Items',
+    to: '/pages/nav/items',
+    icon: <CIcon icon={cilMug} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavGroup,
+    name: 'Manage Types',
+    to: '/categories',
+    icon: <CIcon icon={cilStream} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Manage Item Types',
+        to: '/categories/itemtypes',
+      },
+      {
+        component: CNavItem,
+        name: 'Manage Alert Type',
+        to: '/categories/alerttypes',
+      },
+      {
+        component: CNavItem,
+        name: 'Manage Notification Type',
+        to: '/categories/notificationtypes',
+      },
+    ],
+  },
+  //end group content
   {
     component: CNavTitle,
     name: 'Notifications & Alerts',
@@ -107,6 +146,7 @@ const _nav = [
     to: '/pages/nav/promotions',
     icon: <CIcon icon={cilAudioDescription} customClassName="nav-icon" />,
   },
+  
   // {
   //   component: CNavItem,
   //   name: 'Typography',

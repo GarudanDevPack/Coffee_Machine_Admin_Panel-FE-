@@ -25,6 +25,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { InputMaskCreditCard, InputMaskPhone } from '../../components/common/CInputForms'
 import { renderTimeViewClock, TimePicker } from '@mui/x-date-pickers'
+import ImageUploader from 'react-image-upload'
+// import Spinner from '../../components/loaders/Spinner'
+import { ReactSortable } from 'react-sortablejs'
 
 export const AddMachineModal = ({ visible, onClose }) => {
   const [properties, setProperties] = useState([])
@@ -1296,6 +1299,607 @@ export const AddPromotionModal = ({ visible, onClose }) => {
               <CCol xs={12} className="mt-3">
                 <CFormCheck id="isActiveCheck" label="Is Active" />
               </CCol>
+            </CRow>
+          </CCardBody>
+        </CCard>
+      </CModalBody>
+      <CModalFooter>
+        <CButton color="primary">Save changes</CButton>
+      </CModalFooter>
+    </CModal>
+  )
+}
+
+export const AddItemModal = ({ visible, onClose }) => {
+  const [properties, setProperties] = useState([])
+  const [images, setImages] = useState([])
+
+  const addProperty = () => {
+    setProperties([...properties, { name: '', values: '' }])
+  }
+
+  const removeProperty = (index) => {
+    setProperties(properties.filter((_, i) => i !== index))
+  }
+
+  const handlePropertyNameChange = (index, value) => {
+    const updatedProperties = [...properties]
+    updatedProperties[index].name = value
+    setProperties(updatedProperties)
+  }
+
+  const handlePropertyValuesChange = (index, value) => {
+    const updatedProperties = [...properties]
+    updatedProperties[index].values = value
+    setProperties(updatedProperties)
+  }
+
+  function updateImagesOrder(images) {
+    //console.log(arguments);
+    setImages(images)
+  }
+
+  return (
+    <CModal
+      alignment="center"
+      scrollable
+      visible={visible}
+      onClose={onClose}
+      aria-labelledby="VerticallyCenteredScrollableExample2"
+    >
+      <CModalHeader>
+        <CModalTitle id="VerticallyCenteredScrollableExample2">Add a Item</CModalTitle>
+      </CModalHeader>
+      <CModalBody>
+        <CCard className="mb-4">
+          {/* <CCardHeader>Manage Machines</CCardHeader> */}
+          <CCardBody>
+            <CRow>
+              {/* <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Outlet Name</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">Outlet 01</option>
+                    <option value="2">Outlet 02</option>
+                    <option value="3" disabled>
+                      Outlet 03
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div> */}
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Client</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">CUS-00001 John</option>
+                    <option value="2">CUS-00011 Mark</option>
+                    <option value="3" disabled>
+                      CUS-00011 Kane
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div>
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Organization</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">CUS-00001 John</option>
+                    <option value="2">CUS-00011 Mark</option>
+                    <option value="3" disabled>
+                      CUS-00011 Kane
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div>
+              <CCol className="mt-2" md={12}>
+                <CFormInput type="text" id="machineType" label="Item Name" placeholder="Name" />
+              </CCol>
+              {/* <CCol md={12}>
+                <CFormInput type="text" id="walletAmount" label="Amount" placeholder="0.00" />
+              </CCol> */}
+              <CCol className="mt-2" md={12}>
+                <CFormInput
+                  type="number"
+                  id="walletAmount"
+                  label="Price"
+                  placeholder="0.00"
+                  step="0.01" // Allow decimals
+                  min="0" // Optional: Prevent negative amounts
+                />
+              </CCol>
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Item Type</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">CUS-00001 John</option>
+                    <option value="2">CUS-00011 Mark</option>
+                    <option value="3" disabled>
+                      CUS-00011 Kane
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div>
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Item Size</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">CUS-00001 John</option>
+                    <option value="2">CUS-00011 Mark</option>
+                    <option value="3" disabled>
+                      CUS-00011 Kane
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div>
+              {/* <div>
+                <ImageUploader
+                  style={{ height: 200, width: 200, background: 'rgb(0 182 255)' }}
+                  deleteIcon={<CIcon className="ml-2" icon={cilPlus} size="sm" />}
+                  uploadIcon={<CIcon className="ml-2" icon={cilTrash} size="sm" />}
+                />
+              </div> */}
+              {/* <CCol className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Serial Number</CFormLabel>
+                </CCol>
+                <InputMaskCreditCard />
+              </CCol>
+              <CCol md={12}>
+                <CFormInput
+                  type="number"
+                  id="walletAmount"
+                  label="CVV"
+                  placeholder="000"
+                  step="0" // Allow decimals
+                  min="0" // Prevent negative amounts
+                  maxLength="3" // Limit to 3 digits
+                  onInput={(e) => {
+                    if (e.target.value.length > 3) {
+                      e.target.value = e.target.value.slice(0, 3) // Enforce the limit
+                    }
+                  }}
+                />
+              </CCol> */}
+              <CCol className="mt-2" md={12}>
+                <CFormTextarea
+                  id="exampleFormControlTextarea1"
+                  label="Description"
+                  rows={3}
+                  text="Must be 8-75 words long."
+                ></CFormTextarea>
+              </CCol>
+              {/* image uploader */}
+              {/* <div className="mb-2 flex flex-wrap gap-1">
+                <ReactSortable
+                  list={images}
+                  className="flex flex-wrap gap-1"
+                  setList={updateImagesOrder}
+                >
+                  {!!images?.length &&
+                    images.map((link) => (
+                      <div key={link} className="h-24 bg-white p-4 shadow-sm rounded-md">
+                        <img src={link} alt="" className="rounded-lg" />
+                      </div>
+                    ))}
+                </ReactSortable>
+                {isuploading && (
+                  <div className="h-24 p-1 flex items-center">
+                    <Spinner />
+                  </div>
+                )}
+                <label className="w-16 h-16 cursor-pointer border rounded-md text-center flex flex-col items-center justify-center text-gray-400 shadow-sm mt-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 16 16"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
+                    />
+                  </svg>
+                  <div>Upload</div>
+                  <input type="file" className="hidden" />
+                </label>
+                {!images?.length && (
+                    <div>No images</div>
+                )}
+              </div> */}
+              <div className="mt-2">
+                <CFormInput type="file" id="formFile" label="Upload Image" />
+              </div>
+              {/* image uploader end */}
+
+              <CCol xs={12} className="mt-3">
+                <CFormCheck id="isActiveCheck" label="Is Active" />
+              </CCol>
+              {/* <CCol xs={12} className="mt-3">
+                <CButton color="primary">Submit</CButton>
+              </CCol> */}
+            </CRow>
+          </CCardBody>
+        </CCard>
+      </CModalBody>
+      <CModalFooter>
+        <CButton color="primary">Save changes</CButton>
+      </CModalFooter>
+    </CModal>
+  )
+}
+
+export const AddItemTypeModal = ({ visible, onClose }) => {
+  const [properties, setProperties] = useState([])
+  const [images, setImages] = useState([])
+
+  const addProperty = () => {
+    setProperties([...properties, { name: '', values: '' }])
+  }
+
+  const removeProperty = (index) => {
+    setProperties(properties.filter((_, i) => i !== index))
+  }
+
+  const handlePropertyNameChange = (index, value) => {
+    const updatedProperties = [...properties]
+    updatedProperties[index].name = value
+    setProperties(updatedProperties)
+  }
+
+  const handlePropertyValuesChange = (index, value) => {
+    const updatedProperties = [...properties]
+    updatedProperties[index].values = value
+    setProperties(updatedProperties)
+  }
+
+  function updateImagesOrder(images) {
+    //console.log(arguments);
+    setImages(images)
+  }
+
+  return (
+    <CModal
+      alignment="center"
+      scrollable
+      visible={visible}
+      onClose={onClose}
+      aria-labelledby="VerticallyCenteredScrollableExample2"
+    >
+      <CModalHeader>
+        <CModalTitle id="VerticallyCenteredScrollableExample2">Add Item Type</CModalTitle>
+      </CModalHeader>
+      <CModalBody>
+        <CCard className="mb-4">
+          {/* <CCardHeader>Manage Machines</CCardHeader> */}
+          <CCardBody>
+            <CRow>
+              {/* <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Outlet Name</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">Outlet 01</option>
+                    <option value="2">Outlet 02</option>
+                    <option value="3" disabled>
+                      Outlet 03
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div> */}
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Client</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">CUS-00001 John</option>
+                    <option value="2">CUS-00011 Mark</option>
+                    <option value="3" disabled>
+                      CUS-00011 Kane
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div>
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Organization</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">CUS-00001 John</option>
+                    <option value="2">CUS-00011 Mark</option>
+                    <option value="3" disabled>
+                      CUS-00011 Kane
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div>
+              <CCol className="mt-2" md={12}>
+                <CFormInput
+                  type="text"
+                  id="machineType"
+                  label="Item Type Name"
+                  placeholder="Name"
+                />
+              </CCol>
+              {/* <CCol md={12}>
+                <CFormInput type="text" id="walletAmount" label="Amount" placeholder="0.00" />
+              </CCol> */}
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Item Size</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">Small</option>
+                    <option value="2">Medium</option>
+                    <option value="3" disabled>
+                      Large
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div>
+              
+              
+              
+              <CCol className="mt-2" md={12}>
+                <CFormTextarea
+                  id="exampleFormControlTextarea1"
+                  label="Description"
+                  rows={3}
+                  text="Must be 8-75 words long."
+                ></CFormTextarea>
+              </CCol>
+              
+              <div className="mt-2">
+                <CFormInput type="file" id="formFile" label="Upload Image" />
+              </div>
+              {/* image uploader end */}
+
+              <CCol xs={12} className="mt-3">
+                <CFormCheck id="isActiveCheck" label="Is Active" />
+              </CCol>
+              {/* <CCol xs={12} className="mt-3">
+                <CButton color="primary">Submit</CButton>
+              </CCol> */}
+            </CRow>
+          </CCardBody>
+        </CCard>
+      </CModalBody>
+      <CModalFooter>
+        <CButton color="primary">Save changes</CButton>
+      </CModalFooter>
+    </CModal>
+  )
+}
+
+export const AddAlertTypeModal = ({ visible, onClose }) => {
+  const [properties, setProperties] = useState([])
+  const [images, setImages] = useState([])
+
+  const addProperty = () => {
+    setProperties([...properties, { name: '', values: '' }])
+  }
+
+  const removeProperty = (index) => {
+    setProperties(properties.filter((_, i) => i !== index))
+  }
+
+  const handlePropertyNameChange = (index, value) => {
+    const updatedProperties = [...properties]
+    updatedProperties[index].name = value
+    setProperties(updatedProperties)
+  }
+
+  const handlePropertyValuesChange = (index, value) => {
+    const updatedProperties = [...properties]
+    updatedProperties[index].values = value
+    setProperties(updatedProperties)
+  }
+
+  function updateImagesOrder(images) {
+    //console.log(arguments);
+    setImages(images)
+  }
+
+  return (
+    <CModal
+      alignment="center"
+      scrollable
+      visible={visible}
+      onClose={onClose}
+      aria-labelledby="VerticallyCenteredScrollableExample2"
+    >
+      <CModalHeader>
+        <CModalTitle id="VerticallyCenteredScrollableExample2">Add Alert Type</CModalTitle>
+      </CModalHeader>
+      <CModalBody>
+        <CCard className="mb-4">
+          {/* <CCardHeader>Manage Machines</CCardHeader> */}
+          <CCardBody>
+            <CRow>
+              {/* <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Outlet Name</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">Outlet 01</option>
+                    <option value="2">Outlet 02</option>
+                    <option value="3" disabled>
+                      Outlet 03
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div> */}
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Client</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">CUS-00001 John</option>
+                    <option value="2">CUS-00011 Mark</option>
+                    <option value="3" disabled>
+                      CUS-00011 Kane
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div>
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Organization</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">CUS-00001 John</option>
+                    <option value="2">CUS-00011 Mark</option>
+                    <option value="3" disabled>
+                      CUS-00011 Kane
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div>
+              <CCol className="mt-2" md={12}>
+                <CFormInput
+                  type="text"
+                  id="machineType"
+                  label="Alert Type Name"
+                  placeholder="Name"
+                />
+              </CCol>
+              <CCol xs={12} className="mt-3">
+                <CFormCheck id="isActiveCheck" label="Is Active" />
+              </CCol>
+              {/* <CCol xs={12} className="mt-3">
+                <CButton color="primary">Submit</CButton>
+              </CCol> */}
+            </CRow>
+          </CCardBody>
+        </CCard>
+      </CModalBody>
+      <CModalFooter>
+        <CButton color="primary">Save changes</CButton>
+      </CModalFooter>
+    </CModal>
+  )
+}
+
+export const AddNotificationTypeModal = ({ visible, onClose }) => {
+  const [properties, setProperties] = useState([])
+  const [images, setImages] = useState([])
+
+  const addProperty = () => {
+    setProperties([...properties, { name: '', values: '' }])
+  }
+
+  const removeProperty = (index) => {
+    setProperties(properties.filter((_, i) => i !== index))
+  }
+
+  const handlePropertyNameChange = (index, value) => {
+    const updatedProperties = [...properties]
+    updatedProperties[index].name = value
+    setProperties(updatedProperties)
+  }
+
+  const handlePropertyValuesChange = (index, value) => {
+    const updatedProperties = [...properties]
+    updatedProperties[index].values = value
+    setProperties(updatedProperties)
+  }
+
+  function updateImagesOrder(images) {
+    //console.log(arguments);
+    setImages(images)
+  }
+
+  return (
+    <CModal
+      alignment="center"
+      scrollable
+      visible={visible}
+      onClose={onClose}
+      aria-labelledby="VerticallyCenteredScrollableExample2"
+    >
+      <CModalHeader>
+        <CModalTitle id="VerticallyCenteredScrollableExample2">Add Notification Type</CModalTitle>
+      </CModalHeader>
+      <CModalBody>
+        <CCard className="mb-4">
+          {/* <CCardHeader>Manage Machines</CCardHeader> */}
+          <CCardBody>
+            <CRow>
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Client</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">CUS-00001 John</option>
+                    <option value="2">CUS-00011 Mark</option>
+                    <option value="3" disabled>
+                      CUS-00011 Kane
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div>
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Organization</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Default select example">
+                    <option>- Select -</option>
+                    <option value="1">CUS-00001 John</option>
+                    <option value="2">CUS-00011 Mark</option>
+                    <option value="3" disabled>
+                      CUS-00011 Kane
+                    </option>
+                  </CFormSelect>
+                </CCol>
+              </div>
+              <CCol className="mt-2" md={12}>
+                <CFormInput
+                  type="text"
+                  id="machineType"
+                  label="Notification Type Name"
+                  placeholder="Name"
+                />
+              </CCol>
+              <CCol xs={12} className="mt-3">
+                <CFormCheck id="isActiveCheck" label="Is Active" />
+              </CCol>
+              {/* <CCol xs={12} className="mt-3">
+                <CButton color="primary">Submit</CButton>
+              </CCol> */}
             </CRow>
           </CCardBody>
         </CCard>
