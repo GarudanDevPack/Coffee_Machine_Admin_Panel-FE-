@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CRow,
   CCol,
@@ -11,73 +11,31 @@ import {
   CFormLabel,
 } from '@coreui/react'
 import { cilPlus, cilTrash } from '@coreui/icons'
-import { TableViewMachine } from '../../../components/tblcomponents/CDataTable'
+// import { TableViewMachine } from '../../../components/tblcomponents/CDataTable'
 import CIcon from '@coreui/icons-react'
 import { AddMachineModal } from '../../modal/AddComponentModel'
 import MachineDataTableMui from '../../../components/tblcomponents/MachineDataTableWithFilter'
+import { fetchAllData, postData } from '../../../api'
 
 const Machines = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [data, setData] = useState([])
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const result = await fetchAllData('getallmachinelogs') // Fetch from /api/items
+        //console.log(result.data)
+        setData(result)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    getData()
+  }, [])
 
   return (
     <>
-      {/* <CCard className="mb-4">
-        <CCardHeader>Manage Machines</CCardHeader>
-        <CCardBody>
-          <CRow>
-            <CCol md={6}>
-              <CFormInput type="text" id="machineName" label="Machine Name" placeholder="Name" />
-            </CCol>
-            <CCol md={6}>
-              <CFormInput type="text" id="machineType" label="Machine Type" placeholder="Type" />
-            </CCol>
-            <CCol xs={12} md={12} className="mt-3">
-              <div className="mb-2">
-                <CRow>
-                  <CFormLabel className="mb-3">Properties</CFormLabel>
-                </CRow>
-                <CButton
-                  color="info"
-                  type="button"
-                  onClick={addProperty}
-                  className="btn-default text-sm mb-4"
-                >
-                  Add
-                  <CIcon className="ml-2" icon={cilPlus} size="sm" />
-                </CButton>
-                {properties.length > 0 &&
-                  properties.map((property, index) => (
-                    <div className="d-flex gap-2 mb-2" key={index}>
-                      <CFormInput
-                        type="text"
-                        className="mb-0"
-                        value={property.name}
-                        onChange={(e) => handlePropertyNameChange(index, e.target.value)}
-                        placeholder="Property name (e.g., color)"
-                      />
-                      <CFormInput
-                        type="text"
-                        className="mb-0"
-                        value={property.values}
-                        onChange={(e) => handlePropertyValuesChange(index, e.target.value)}
-                        placeholder="Values, comma-separated"
-                      />
-                      <CButton color="danger" type="button" onClick={() => removeProperty(index)}>
-                        <CIcon className="ml-2" icon={cilTrash} size="sm" />
-                      </CButton>
-                    </div>
-                  ))}
-              </div>
-            </CCol>
-            <CCol xs={12} className="mt-3">
-              <CFormCheck id="isActiveCheck" label="Is Active" />
-            </CCol>
-            <CCol xs={12} className="mt-3">
-              <CButton color="primary">Submit</CButton>
-            </CCol>
-          </CRow>
-        </CCardBody>
-      </CCard> */}
       <CCard className="mb-4">
         <CCardHeader>
           <div className="d-flex justify-content-between align-items-center">
@@ -88,9 +46,10 @@ const Machines = () => {
                 color="info"
                 type="button"
                 onClick={() => setIsModalVisible(true)}
+                // onClick={() => console.log(data)}
                 className="btn-default text-sm"
               >
-                Add&nbsp;
+                Add Machine&nbsp;
                 <CIcon className="ml-2" icon={cilPlus} size="sm" />
               </CButton>
 
@@ -123,7 +82,7 @@ const Machines = () => {
         </CCardHeader>
 
         <CCardBody className="mt-4">
-          <MachineDataTableMui />
+          <MachineDataTableMui tableData={data}/>
           {/* <TableViewMachine /> */}
         </CCardBody>
       </CCard>

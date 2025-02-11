@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -25,9 +25,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { InputMaskCreditCard, InputMaskPhone } from '../../components/common/CInputForms'
 import { renderTimeViewClock, TimePicker } from '@mui/x-date-pickers'
-import ImageUploader from 'react-image-upload'
+import { fetchAllData, getAllData, getAllQueryData } from '../../api'
+// import ImageUploader from 'react-image-upload'
 // import Spinner from '../../components/loaders/Spinner'
-import { ReactSortable } from 'react-sortablejs'
+// import { ReactSortable } from 'react-sortablejs'
 
 export const AddMachineModal = ({ visible, onClose }) => {
   const [properties, setProperties] = useState([])
@@ -52,6 +53,62 @@ export const AddMachineModal = ({ visible, onClose }) => {
     setProperties(updatedProperties)
   }
 
+  const [itemData, setItemData] = useState([])
+  const [clients, setClients] = useState([])
+  const [selectedClient, setSelectedClient] = useState('')
+  const [organizations, setOrganizations] = useState([])
+
+  useEffect(() => {
+    const getClientData = async () => {
+      try {
+        const result = await fetchAllData('clientlogs') // Fetch from /api/items
+        console.log(result.data)
+        setClients(result.data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    const getItemData = async () => {
+      try {
+        const result = await getAllQueryData('itemsbyclient', 'client_id=1&org_id=1') // Fetch data
+        console.log(result.data)
+        setItemData(result.data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    getClientData()
+    getItemData()
+  }, [])
+
+  const handleClientChange = (event) => {
+    const clientId = event.target.value
+    setSelectedClient(clientId)
+
+    // Find the selected client and update organizations
+    const client = clients.find((c) => c.id.toString() === clientId)
+    setOrganizations(client ? client.org : [])
+  }
+
+  // useEffect(() => {
+  //   const getData = async () => {
+  //     try {
+  //       const result = await getAllQueryData('itemsbyclient', 'client_id=1&org_id=1') // Fetch data
+  //       console.log(result.data)
+  //       setData(result.data)
+
+  //       const uniqueClients = Array.from(new Set(result.data.map((item) => item.client_id)))
+  //       setClients(uniqueClients)
+  //     } catch (error) {
+  //       console.error(error)
+  //     }
+  //   }
+
+  //   getData()
+  // }, [])
+
   return (
     <CModal
       alignment="center"
@@ -68,24 +125,47 @@ export const AddMachineModal = ({ visible, onClose }) => {
           {/* <CCardHeader>Manage Machines</CCardHeader> */}
           <CCardBody>
             <CRow>
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Client</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect
+                    aria-label="Select Client"
+                    value={selectedClient}
+                    onChange={handleClientChange}
+                  >
+                    <option value="">- Select -</option>
+                    {clients.map((client) => (
+                      <option key={client.id} value={client.id}>
+                        {client.name}
+                      </option>
+                    ))}
+                  </CFormSelect>
+                </CCol>
+              </div>
+              <div className="mt-2" md={12}>
+                <CCol>
+                  <CFormLabel>Organization</CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormSelect aria-label="Select Organization">
+                    <option value="">- Select -</option>
+                    {organizations.map((org) => (
+                      <option key={org.id} value={org.id}>
+                        {org.name}
+                      </option>
+                    ))}
+                  </CFormSelect>
+                </CCol>
+              </div>
               <CCol md={12}>
                 <CFormInput type="text" id="machineName" label="Machine Name" placeholder="Name" />
-              </CCol>
-              <CCol className="mt-2" md={12}>
-                <CFormInput type="text" id="machineType" label="Outlet Name" placeholder="Type" />
-              </CCol>
-              <CCol className="mt-2" md={12}>
-                <CFormInput
-                  type="text"
-                  id="machineType"
-                  label="Loading Quantity"
-                  placeholder="Type"
-                />
               </CCol>
               <CCol xs={12} md={12} className="mt-3">
                 <div className="mb-2">
                   <CRow>
-                    <CFormLabel className="mb-3">Features</CFormLabel>
+                    <CFormLabel className="mb-3">Inventory</CFormLabel>
                   </CRow>
                   <CButton
                     color="info"
@@ -93,25 +173,33 @@ export const AddMachineModal = ({ visible, onClose }) => {
                     onClick={addProperty}
                     className="btn-default text-sm mb-4"
                   >
-                    Add Features&nbsp;
+                    Add Inventory&nbsp;
                     <CIcon className="ml-2" icon={cilPlus} size="sm" />
                   </CButton>
                   {properties.length > 0 &&
                     properties.map((property, index) => (
                       <div className="d-flex gap-2 mb-2" key={index}>
+                        <CFormSelect aria-label="Default select example">
+                          <option>- Select -</option>
+                          <option value="1">Male</option>
+                          <option value="2">Female</option>
+                          <option value="3" disabled>
+                            Other
+                          </option>
+                        </CFormSelect>
                         <CFormInput
                           type="text"
                           className="mb-0"
-                          value={property.name}
-                          onChange={(e) => handlePropertyNameChange(index, e.target.value)}
-                          placeholder="Property name (e.g., color)"
+                          value={property.values}
+                          onChange={(e) => handlePropertyValuesChange(index, e.target.value)}
+                          placeholder="Stock"
                         />
                         <CFormInput
                           type="text"
                           className="mb-0"
                           value={property.values}
                           onChange={(e) => handlePropertyValuesChange(index, e.target.value)}
-                          placeholder="Values, comma-separated"
+                          placeholder="QTY of machine"
                         />
                         <CButton color="danger" type="button" onClick={() => removeProperty(index)}>
                           <CIcon className="ml-2" icon={cilTrash} size="sm" />
@@ -123,9 +211,6 @@ export const AddMachineModal = ({ visible, onClose }) => {
               <CCol xs={12} className="mt-3">
                 <CFormCheck id="isActiveCheck" label="Is Active" />
               </CCol>
-              {/* <CCol xs={12} className="mt-3">
-                <CButton color="primary">Submit</CButton>
-              </CCol> */}
             </CRow>
           </CCardBody>
         </CCard>
@@ -1662,9 +1747,7 @@ export const AddItemTypeModal = ({ visible, onClose }) => {
                   </CFormSelect>
                 </CCol>
               </div>
-              
-              
-              
+
               <CCol className="mt-2" md={12}>
                 <CFormTextarea
                   id="exampleFormControlTextarea1"
@@ -1673,7 +1756,7 @@ export const AddItemTypeModal = ({ visible, onClose }) => {
                   text="Must be 8-75 words long."
                 ></CFormTextarea>
               </CCol>
-              
+
               <div className="mt-2">
                 <CFormInput type="file" id="formFile" label="Upload Image" />
               </div>

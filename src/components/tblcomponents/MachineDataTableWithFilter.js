@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
-import { CButton } from '@coreui/react' // Import CoreUI buttons if needed
+import { CBadge, CButton } from '@coreui/react' // Import CoreUI buttons if needed
 import { cilPenAlt, cilTrash, cilQrCode } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
@@ -10,76 +10,87 @@ import CIcon from '@coreui/icons-react'
  * copyright 2025
  */
 
-const data = [
-  {
-    id: 1,
-    machineId:'MC-00001',
-    outletName: 'Colombo',
-    loadingQty: '500',
-    features: 'Load Extras',
-    addedDate: '12-12-2000',
-    createdDate: '01-01-2025',
-  },
-  {
-    id: 2,
-    machineId:'MC-00002',
-    outletName: 'Colombo',
-    loadingQty: '200',
-    features: 'Load Extras',
-    addedDate: '12-12-2000',
-    createdDate: '01-01-2025',
-  },
+// const data = [
+//   {
+//     id: 1,
+//     machineId: 'MC-00001',
+//     outletName: 'Colombo',
+//     loadingQty: '500',
+//     features: 'Load Extras',
+//     addedDate: '12-12-2000',
+//     createdDate: '01-01-2025',
+//   },
 //   {
 //     id: 2,
-//     name: {
-//       firstName: 'Jane',
-//       lastName: 'Doe',
-//     },
-//     mobile: '+94112345678',
-//     email: 'jane.doe@example.com',
-//     gender: 'Female',
-//     dob: '10-10-1990',
-//     createdDate: '15-01-2025',
+//     machineId: 'MC-00002',
+//     outletName: 'Colombo',
+//     loadingQty: '200',
+//     features: 'Load Extras',
+//     addedDate: '12-12-2000',
+//     createdDate: '01-01-2025',
 //   },
-  // Add more data as needed
-]
+//   //   {
+//   //     id: 2,
+//   //     name: {
+//   //       firstName: 'Jane',
+//   //       lastName: 'Doe',
+//   //     },
+//   //     mobile: '+94112345678',
+//   //     email: 'jane.doe@example.com',
+//   //     gender: 'Female',
+//   //     dob: '10-10-1990',
+//   //     createdDate: '15-01-2025',
+//   //   },
+//   // Add more data as needed
+// ]
 
-export const MachineDataTableMui = () => {
+export const MachineDataTableMui = ({ tableData }) => {
+  // console.log("New",tableData.data);
   // Columns should be memoized or stable
   const columns = useMemo(
     () => [
+      // {
+      //   accessorKey: '',
+      //   header: '#',
+      //   size: 50,
+      // },
+      // {
+      //   accessorKey: 'id', // Access nested data with dot notation
+      //   header: 'Machine ID',
+      //   size: 150,
+      // },
       {
-        accessorKey: 'id',
-        header: '#',
-        size: 50,
-      },
-      {
-        accessorKey: 'machineId', // Access nested data with dot notation
-        header: 'Machine ID',
+        accessorKey: 'name',
+        header: 'Name',
         size: 150,
       },
       {
-        accessorKey: 'outletName',
-        header: 'Outlet Name',
+        accessorKey: 'client_id.name',
+        header: 'Client Name',
         size: 150,
       },
       {
-        accessorKey: 'loadingQty',
+        accessorKey: 'org_id.name',
+        header: 'Org Name',
+        size: 150,
+      },
+      {
+        accessorKey: 'inventory.length',
         header: 'Loading QTY',
         size: 150,
       },
       {
-        accessorKey: 'features',
-        header: 'Features',
-        size: 200,
-      },
-      {
-        accessorKey: 'addedDate',
-        header: 'Added Date',
+        accessorKey: 'status',
+        header: 'Status',
         size: 100,
+        Cell: ({ cell }) => (
+          <CBadge color={cell.getValue() === 'online' ? 'success' : 'danger'}>
+            {cell.getValue()}
+          </CBadge>
+        ),
       },
       {
-        accessorKey: 'createdDate',
+        accessorKey: 'createdAt',
         header: 'Created Date',
         size: 150,
       },
@@ -107,7 +118,7 @@ export const MachineDataTableMui = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data, // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    data: tableData.data || [], // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
   })
 
   return <MaterialReactTable table={table} />

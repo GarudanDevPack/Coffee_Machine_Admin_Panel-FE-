@@ -16,7 +16,8 @@
     "build": "vite build",
     "lint": "eslint \"src/**/*.js\"",
     "serve": "vite preview",
-    "start": "vite"
+    "start": "vite",
+    "dev": "vite"
   },
   "dependencies": {
     "@coreui/chartjs": "^4.0.0",
@@ -28,9 +29,11 @@
     "@coreui/utils": "^2.0.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/material": "^6.3.0",
-    "@mui/x-date-pickers": "^7.23.3",
+    "@mui/icons-material": "^6.4.3",
+    "@mui/material": "^6.4.3",
+    "@mui/x-date-pickers": "^7.26.0",
     "@popperjs/core": "^2.11.8",
+    "axios": "^1.7.9",
     "bootstrap-icons": "^1.11.3",
     "chart.js": "^4.4.6",
     "classnames": "^2.5.1",
