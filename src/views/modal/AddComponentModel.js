@@ -25,44 +25,44 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { InputMaskCreditCard, InputMaskPhone } from '../../components/common/CInputForms'
 import { renderTimeViewClock, TimePicker } from '@mui/x-date-pickers'
-import { fetchAllData, getAllData, getAllQueryData } from '../../api'
+import { fetchAllData, getAllData, getAllQueryData, postData } from '../../api'
+import Swal from 'sweetalert2'
 // import ImageUploader from 'react-image-upload'
 // import Spinner from '../../components/loaders/Spinner'
 // import { ReactSortable } from 'react-sortablejs'
 
 export const AddMachineModal = ({ visible, onClose }) => {
   const [properties, setProperties] = useState([])
-
-  const addProperty = () => {
-    setProperties([...properties, { name: '', values: '' }])
-  }
-
-  const removeProperty = (index) => {
-    setProperties(properties.filter((_, i) => i !== index))
-  }
-
-  const handlePropertyNameChange = (index, value) => {
-    const updatedProperties = [...properties]
-    updatedProperties[index].name = value
-    setProperties(updatedProperties)
-  }
-
-  const handlePropertyValuesChange = (index, value) => {
-    const updatedProperties = [...properties]
-    updatedProperties[index].values = value
-    setProperties(updatedProperties)
-  }
-
   const [itemData, setItemData] = useState([])
   const [clients, setClients] = useState([])
   const [selectedClient, setSelectedClient] = useState('')
   const [organizations, setOrganizations] = useState([])
+  const [machineName, setMachineName] = useState('')
+  const [selectedOrg, setSelectedOrg] = useState('')
+  const [isActive, setIsActive] = useState(false)
 
+  // Add a new property (inventory item)
+  const addProperty = () => {
+    setProperties([...properties, { item_id: '', stock: '', qty: '' }])
+  }
+
+  // Remove a property (inventory item)
+  const removeProperty = (index) => {
+    setProperties(properties.filter((_, i) => i !== index))
+  }
+
+  // Handle changes in inventory item fields
+  const handlePropertyChange = (index, field, value) => {
+    const updatedProperties = [...properties]
+    updatedProperties[index][field] = value
+    setProperties(updatedProperties)
+  }
+
+  // Fetch clients and item data on component mount
   useEffect(() => {
     const getClientData = async () => {
       try {
         const result = await fetchAllData('clientlogs') // Fetch from /api/items
-        console.log(result.data)
         setClients(result.data)
       } catch (error) {
         console.error(error)
@@ -72,7 +72,6 @@ export const AddMachineModal = ({ visible, onClose }) => {
     const getItemData = async () => {
       try {
         const result = await getAllQueryData('itemsbyclient', 'client_id=1&org_id=1') // Fetch data
-        console.log(result.data)
         setItemData(result.data)
       } catch (error) {
         console.error(error)
@@ -83,6 +82,7 @@ export const AddMachineModal = ({ visible, onClose }) => {
     getItemData()
   }, [])
 
+  // Handle client selection change
   const handleClientChange = (event) => {
     const clientId = event.target.value
     setSelectedClient(clientId)
@@ -92,37 +92,86 @@ export const AddMachineModal = ({ visible, onClose }) => {
     setOrganizations(client ? client.org : [])
   }
 
-  // useEffect(() => {
-  //   const getData = async () => {
-  //     try {
-  //       const result = await getAllQueryData('itemsbyclient', 'client_id=1&org_id=1') // Fetch data
-  //       console.log(result.data)
-  //       setData(result.data)
+  // Handle organization selection change
+  const handleOrgChange = (event) => {
+    setSelectedOrg(event.target.value)
+  }
 
-  //       const uniqueClients = Array.from(new Set(result.data.map((item) => item.client_id)))
-  //       setClients(uniqueClients)
-  //     } catch (error) {
-  //       console.error(error)
-  //     }
-  //   }
+  // Handle machine name change
+  const handleMachineNameChange = (event) => {
+    setMachineName(event.target.value)
+  }
 
-  //   getData()
-  // }, [])
+  // Handle isActive checkbox change
+  const handleIsActiveChange = (event) => {
+    setIsActive(event.target.checked)
+  }
+
+  // Handle save button click
+  const handleSave = async () => {
+    // Construct the data object
+    console.log('in save function')
+    const data = {
+      //id: String(Math.random().toString(36).substr(2, 9)), // Generate a unique ID
+      client_id: {
+        id: Number(selectedClient),
+        name: clients.find((c) => c.id.toString() === selectedClient)?.name || '',
+      },
+      org_id: {
+        id: Number(selectedOrg),
+        name: organizations.find((org) => org.id.toString() === selectedOrg)?.name || '',
+      },
+      name: machineName,
+      item_id: properties.map((prop) => prop.item_id),
+      status: isActive ? 'online' : 'offline',
+      last_maintenance: new Date(),
+      expire_at: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Set expire_at to 1 year from now
+      inventory: properties.map((prop) => ({
+        item_id: prop.item_id,
+        stock: Number(prop.stock),
+        qty: Number(prop.qty),
+      })),
+      //qr_id: String(Math.random().toString(36).substr(2, 9)),
+      //error: '',
+    }
+
+    // Log the data (for testing)
+    console.log('Saved Data:', data)
+
+    try {
+      // Call the postData function to save the data
+      const response = await postData('createmachinelog', data)
+      console.log('Data saved successfully:', response)
+      if (response) {
+        Swal.fire({
+          title: 'Saved !',
+          text: 'Machine is Save Successfully!',
+          icon: 'success',
+        })
+      }
+      if (!response) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+          //footer: '<a href="#">Why do I have this issue?</a>'
+        })
+      }
+
+      // Close the modal
+      onClose()
+    } catch (error) {
+      console.error('Error saving data:', error)
+    }
+  }
 
   return (
-    <CModal
-      alignment="center"
-      scrollable
-      visible={visible}
-      onClose={onClose}
-      aria-labelledby="VerticallyCenteredScrollableExample2"
-    >
+    <CModal alignment="center" scrollable visible={visible} onClose={onClose}>
       <CModalHeader>
-        <CModalTitle id="VerticallyCenteredScrollableExample2">Add Machine</CModalTitle>
+        <CModalTitle>Add Machine</CModalTitle>
       </CModalHeader>
       <CModalBody>
         <CCard className="mb-4">
-          {/* <CCardHeader>Manage Machines</CCardHeader> */}
           <CCardBody>
             <CRow>
               <div className="mt-2" md={12}>
@@ -149,7 +198,11 @@ export const AddMachineModal = ({ visible, onClose }) => {
                   <CFormLabel>Organization</CFormLabel>
                 </CCol>
                 <CCol>
-                  <CFormSelect aria-label="Select Organization">
+                  <CFormSelect
+                    aria-label="Select Organization"
+                    value={selectedOrg}
+                    onChange={handleOrgChange}
+                  >
                     <option value="">- Select -</option>
                     {organizations.map((org) => (
                       <option key={org.id} value={org.id}>
@@ -160,7 +213,14 @@ export const AddMachineModal = ({ visible, onClose }) => {
                 </CCol>
               </div>
               <CCol md={12}>
-                <CFormInput type="text" id="machineName" label="Machine Name" placeholder="Name" />
+                <CFormInput
+                  type="text"
+                  id="machineName"
+                  label="Machine Name"
+                  placeholder="Name"
+                  value={machineName}
+                  onChange={handleMachineNameChange}
+                />
               </CCol>
               <CCol xs={12} md={12} className="mt-3">
                 <div className="mb-2">
@@ -179,26 +239,30 @@ export const AddMachineModal = ({ visible, onClose }) => {
                   {properties.length > 0 &&
                     properties.map((property, index) => (
                       <div className="d-flex gap-2 mb-2" key={index}>
-                        <CFormSelect aria-label="Default select example">
+                        <CFormSelect
+                          aria-label="Select Item"
+                          value={property.item_id}
+                          onChange={(e) => handlePropertyChange(index, 'item_id', e.target.value)}
+                        >
                           <option>- Select -</option>
-                          <option value="1">Male</option>
-                          <option value="2">Female</option>
-                          <option value="3" disabled>
-                            Other
-                          </option>
+                          {itemData.map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.name}
+                            </option>
+                          ))}
                         </CFormSelect>
                         <CFormInput
                           type="text"
                           className="mb-0"
-                          value={property.values}
-                          onChange={(e) => handlePropertyValuesChange(index, e.target.value)}
+                          value={property.stock}
+                          onChange={(e) => handlePropertyChange(index, 'stock', e.target.value)}
                           placeholder="Stock"
                         />
                         <CFormInput
                           type="text"
                           className="mb-0"
-                          value={property.values}
-                          onChange={(e) => handlePropertyValuesChange(index, e.target.value)}
+                          value={property.qty}
+                          onChange={(e) => handlePropertyChange(index, 'qty', e.target.value)}
                           placeholder="QTY of machine"
                         />
                         <CButton color="danger" type="button" onClick={() => removeProperty(index)}>
@@ -209,18 +273,204 @@ export const AddMachineModal = ({ visible, onClose }) => {
                 </div>
               </CCol>
               <CCol xs={12} className="mt-3">
-                <CFormCheck id="isActiveCheck" label="Is Active" />
+                <CFormCheck
+                  id="isActiveCheck"
+                  label="Is Online"
+                  checked={isActive}
+                  onChange={handleIsActiveChange}
+                />
               </CCol>
             </CRow>
           </CCardBody>
         </CCard>
       </CModalBody>
       <CModalFooter>
-        <CButton color="primary">Save changes</CButton>
+        <CButton color="primary" onClick={handleSave}>
+          Save changes
+        </CButton>
       </CModalFooter>
     </CModal>
   )
 }
+// export const AddMachineModal = ({ visible, onClose }) => {
+//   const [properties, setProperties] = useState([])
+
+//   const addProperty = () => {
+//     setProperties([...properties, { name: '', values: '' }])
+//   }
+
+//   const removeProperty = (index) => {
+//     setProperties(properties.filter((_, i) => i !== index))
+//   }
+
+//   const handlePropertyNameChange = (index, value) => {
+//     const updatedProperties = [...properties]
+//     updatedProperties[index].name = value
+//     setProperties(updatedProperties)
+//   }
+
+//   const handlePropertyValuesChange = (index, value) => {
+//     const updatedProperties = [...properties]
+//     updatedProperties[index].values = value
+//     setProperties(updatedProperties)
+//   }
+
+//   const [itemData, setItemData] = useState([])
+//   const [clients, setClients] = useState([])
+//   const [selectedClient, setSelectedClient] = useState('')
+//   const [organizations, setOrganizations] = useState([])
+
+//   useEffect(() => {
+//     const getClientData = async () => {
+//       try {
+//         const result = await fetchAllData('clientlogs') // Fetch from /api/items
+//         console.log(result.data)
+//         setClients(result.data)
+//       } catch (error) {
+//         console.error(error)
+//       }
+//     }
+
+//     const getItemData = async () => {
+//       try {
+//         const result = await getAllQueryData('itemsbyclient', 'client_id=1&org_id=1') // Fetch data
+//         console.log(result.data)
+//         setItemData(result.data)
+//       } catch (error) {
+//         console.error(error)
+//       }
+//     }
+
+//     getClientData()
+//     getItemData()
+//   }, [])
+
+//   const handleClientChange = (event) => {
+//     const clientId = event.target.value
+//     setSelectedClient(clientId)
+
+//     // Find the selected client and update organizations
+//     const client = clients.find((c) => c.id.toString() === clientId)
+//     setOrganizations(client ? client.org : [])
+//   }
+
+//   return (
+//     <CModal
+//       alignment="center"
+//       scrollable
+//       visible={visible}
+//       onClose={onClose}
+//       aria-labelledby="VerticallyCenteredScrollableExample2"
+//     >
+//       <CModalHeader>
+//         <CModalTitle id="VerticallyCenteredScrollableExample2">Add Machine</CModalTitle>
+//       </CModalHeader>
+//       <CModalBody>
+//         <CCard className="mb-4">
+//           {/* <CCardHeader>Manage Machines</CCardHeader> */}
+//           <CCardBody>
+//             <CRow>
+//               <div className="mt-2" md={12}>
+//                 <CCol>
+//                   <CFormLabel>Client</CFormLabel>
+//                 </CCol>
+//                 <CCol>
+//                   <CFormSelect
+//                     aria-label="Select Client"
+//                     value={selectedClient}
+//                     onChange={handleClientChange}
+//                   >
+//                     <option value="">- Select -</option>
+//                     {clients.map((client) => (
+//                       <option key={client.id} value={client.id}>
+//                         {client.name}
+//                       </option>
+//                     ))}
+//                   </CFormSelect>
+//                 </CCol>
+//               </div>
+//               <div className="mt-2" md={12}>
+//                 <CCol>
+//                   <CFormLabel>Organization</CFormLabel>
+//                 </CCol>
+//                 <CCol>
+//                   <CFormSelect aria-label="Select Organization">
+//                     <option value="">- Select -</option>
+//                     {organizations.map((org) => (
+//                       <option key={org.id} value={org.id}>
+//                         {org.name}
+//                       </option>
+//                     ))}
+//                   </CFormSelect>
+//                 </CCol>
+//               </div>
+//               <CCol md={12}>
+//                 <CFormInput type="text" id="machineName" label="Machine Name" placeholder="Name" />
+//               </CCol>
+//               <CCol xs={12} md={12} className="mt-3">
+//                 <div className="mb-2">
+//                   <CRow>
+//                     <CFormLabel className="mb-3">Inventory</CFormLabel>
+//                   </CRow>
+//                   <CButton
+//                     color="info"
+//                     type="button"
+//                     onClick={addProperty}
+//                     className="btn-default text-sm mb-4"
+//                   >
+//                     Add Inventory&nbsp;
+//                     <CIcon className="ml-2" icon={cilPlus} size="sm" />
+//                   </CButton>
+//                   {properties.length > 0 &&
+//                     properties.map((property, index) => (
+//                       <div className="d-flex gap-2 mb-2" key={index}>
+//                         <CFormSelect aria-label="Default select example">
+//                           <option>- Select -</option>
+//                           {itemData.map((item) => (
+//                             <option key={item.id} value={item.id}>
+//                               {item.name}
+//                             </option>
+//                           ))}
+//                           {/* <option value="1">Male</option>
+//                           <option value="2">Female</option>
+//                           <option value="3" disabled>
+//                             Other
+//                           </option> */}
+//                         </CFormSelect>
+//                         <CFormInput
+//                           type="text"
+//                           className="mb-0"
+//                           value={property.values}
+//                           onChange={(e) => handlePropertyValuesChange(index, e.target.value)}
+//                           placeholder="Stock"
+//                         />
+//                         <CFormInput
+//                           type="text"
+//                           className="mb-0"
+//                           value={property.values}
+//                           onChange={(e) => handlePropertyValuesChange(index, e.target.value)}
+//                           placeholder="QTY of machine"
+//                         />
+//                         <CButton color="danger" type="button" onClick={() => removeProperty(index)}>
+//                           <CIcon className="ml-2" icon={cilTrash} size="sm" />
+//                         </CButton>
+//                       </div>
+//                     ))}
+//                 </div>
+//               </CCol>
+//               <CCol xs={12} className="mt-3">
+//                 <CFormCheck id="isActiveCheck" label="Is Active" />
+//               </CCol>
+//             </CRow>
+//           </CCardBody>
+//         </CCard>
+//       </CModalBody>
+//       <CModalFooter>
+//         <CButton color="primary">Save changes</CButton>
+//       </CModalFooter>
+//     </CModal>
+//   )
+// }
 
 export const AddCustomerModal = ({ visible, onClose }) => {
   const [properties, setProperties] = useState([])

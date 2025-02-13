@@ -54,35 +54,12 @@ const Machines = () => {
               </CButton>
 
               <AddMachineModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} />
-              {/* <CButton
-                color="info"
-                type="button"
-                onClick={() => console.log('popup add items!')}
-                className="btn-default text-sm"
-              >
-                Add  
-                <CIcon className="ml-2" icon={cilPlus} size="sm" />
-              </CButton> */}
             </div>
           </div>
-          {/* <CRow> */}
-          {/* <div className="d-flex auto">
-            <div>Manage Machines</div>
-            <CButton
-              color="info"
-              type="button"
-              onClick={console.log('popup add items !')}
-              className="btn-default text-sm mb-4"
-            >
-              Add
-              <CIcon className="ml-2" icon={cilPlus} size="sm" />
-            </CButton>
-          </div> */}
-          {/* </CRow> */}
         </CCardHeader>
 
         <CCardBody className="mt-4">
-          <MachineDataTableMui tableData={data}/>
+          <MachineDataTableMui tableData={data} />
           {/* <TableViewMachine /> */}
         </CCardBody>
       </CCard>
