@@ -16,23 +16,25 @@ import CIcon from '@coreui/icons-react'
 import { AddMachineModal } from '../../modal/AddComponentModel'
 import MachineDataTableMui from '../../../components/tblcomponents/MachineDataTableWithFilter'
 import { fetchAllData, postData } from '../../../api'
+import { useDispatch } from 'react-redux'
+import { fetchMachines } from '../../../actions/machineActions'
 
 const Machines = () => {
+  const dispatch = useDispatch()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [data, setData] = useState([])
 
   useEffect(() => {
     const getData = async () => {
       try {
-        const result = await fetchAllData('getallmachinelogs') // Fetch from /api/items
-        //console.log(result.data)
+        const result = await dispatch(fetchMachines())
         setData(result)
       } catch (error) {
         console.error(error)
       }
     }
     getData()
-  }, [])
+  }, [!isModalVisible])
 
   return (
     <>

@@ -9,7 +9,7 @@ import BrewStocksDataTableMui from '../../../components/tblcomponents/BrewStockD
  * author Anushka Isuru Lakmal
  * created on 02-01-2025-13h-41m
  * copyright 2025
-*/
+ */
 
 const BrewStocks = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -33,18 +33,16 @@ const BrewStocks = () => {
                 Add New Stock&nbsp;
                 <CIcon className="ml-2" icon={cilPlus} size="sm" />
               </CButton>
-              <AddBrewStockModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} />
+              <AddBrewStockModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+              />
             </div>
           </div>
         </CCardHeader>
 
         <CCardBody className="mt-4">
-            <BrewStocksDataTableMui/>
-          {/* <CustomerDataTableMui /> */}
-          {/* <CustomerDataTableMui /> */}
-          {/* <TableViewCustomerWithFilter /> */}
-          {/* <TableViewCustomerWithFilter/> */}
-          {/* <DataTableMe /> */}
+          <BrewStocksDataTableMui />
         </CCardBody>
       </CCard>
     </>
