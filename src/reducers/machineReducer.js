@@ -41,7 +41,7 @@ const machineReducer = (state = initialState, action) => {
     case DELETE_MACHINE:
       return {
         ...state,
-        machines: state.machines.filter((machine) => machine.id !== action.payload),
+        machinearr: state.machinearr.filter((machine) => machine.id !== action.payload),
       }
     default:
       return state

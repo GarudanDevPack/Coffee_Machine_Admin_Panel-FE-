@@ -3,7 +3,6 @@ import {
   CButton,
   CCard,
   CCardBody,
-  CCardHeader,
   CFormSelect,
   CCol,
   CFormCheck,
@@ -25,7 +24,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { InputMaskCreditCard, InputMaskPhone } from '../../components/common/CInputForms'
 import { renderTimeViewClock, TimePicker } from '@mui/x-date-pickers'
-import { fetchAllData, getAllData, getAllQueryData, postData } from '../../api'
 import Swal from 'sweetalert2'
 import { addMachine } from '../../actions/machineActions'
 import { useDispatch } from 'react-redux'
@@ -58,6 +56,7 @@ export const AddMachineModal = ({ visible, onClose }) => {
   }
 
   useEffect(() => {
+    resetForm()
     const getClientData = async () => {
       try {
         const result = await dispatch(fetchClients())
@@ -105,6 +104,14 @@ export const AddMachineModal = ({ visible, onClose }) => {
     setIsActive(event.target.checked)
   }
 
+  const resetForm = () => {
+    setProperties([]) // Clear inventory
+    setMachineName('') // Clear machine name
+    setSelectedClient('')
+    setSelectedOrg('')
+    setIsActive(false)
+  }
+
   // Handle save button click
   const handleSave = async () => {
     // Construct the data object
@@ -129,17 +136,15 @@ export const AddMachineModal = ({ visible, onClose }) => {
       })),
     }
 
-    // Dispatch the Redux action to save the machine
     try {
-      const response = await dispatch(addMachine(data)) // Dispatch the Redux action
-      console.log(data)
-      console.log(response)
+      const response = await dispatch(addMachine(data))
       if (response) {
         Swal.fire({
           title: 'Saved!',
           text: 'Machine is saved successfully!',
           icon: 'success',
         })
+        resetForm()
         onClose() // Close the modal
       } else {
         Swal.fire({

@@ -72,7 +72,7 @@ export const updateMachinestatus = (id) => async (dispatch) => {
 
 export const deleteMachine = (id) => async (dispatch) => {
   try {
-    await axios.delete(`${API_BASE_URL}/deletemachinelog/${id}`)
+    await axios.delete(`${API_BASE_URL}/deletemachinelog?id=${id}`)
     dispatch({ type: DELETE_MACHINE, payload: id })
   } catch (error) {
     console.error('Error adding machine:', error)

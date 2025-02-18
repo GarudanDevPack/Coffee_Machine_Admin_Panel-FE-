@@ -10,54 +10,13 @@ import CIcon from '@coreui/icons-react'
  * copyright 2025
  */
 
-// const data = [
-//   {
-//     id: 1,
-//     machineId: 'MC-00001',
-//     outletName: 'Colombo',
-//     loadingQty: '500',
-//     features: 'Load Extras',
-//     addedDate: '12-12-2000',
-//     createdDate: '01-01-2025',
-//   },
-//   {
-//     id: 2,
-//     machineId: 'MC-00002',
-//     outletName: 'Colombo',
-//     loadingQty: '200',
-//     features: 'Load Extras',
-//     addedDate: '12-12-2000',
-//     createdDate: '01-01-2025',
-//   },
-//   //   {
-//   //     id: 2,
-//   //     name: {
-//   //       firstName: 'Jane',
-//   //       lastName: 'Doe',
-//   //     },
-//   //     mobile: '+94112345678',
-//   //     email: 'jane.doe@example.com',
-//   //     gender: 'Female',
-//   //     dob: '10-10-1990',
-//   //     createdDate: '15-01-2025',
-//   //   },
-//   // Add more data as needed
-// ]
-
-export const MachineDataTableMui = ({ tableData }) => {
-  // console.log("New",tableData.data);
-  // Columns should be memoized or stable
+export const MachineDataTableMui = ({ tableData, onDelete, onQRClick }) => {
   const columns = useMemo(
     () => [
       // {
       //   accessorKey: '',
       //   header: '#',
       //   size: 50,
-      // },
-      // {
-      //   accessorKey: 'id', // Access nested data with dot notation
-      //   header: 'Machine ID',
-      //   size: 150,
       // },
       {
         accessorKey: 'name',
@@ -90,6 +49,11 @@ export const MachineDataTableMui = ({ tableData }) => {
         ),
       },
       {
+        accessorKey: 'error',
+        header: 'Description',
+        size: 150,
+      },
+      {
         accessorKey: 'createdAt',
         header: 'Created Date',
         size: 150,
@@ -100,20 +64,30 @@ export const MachineDataTableMui = ({ tableData }) => {
         size: 200,
         Cell: ({ row }) => (
           <div>
-            <CButton color="info" size="sm" className="me-1">
+            <CButton
+              color="info"
+              size="sm"
+              className="me-1"
+              onClick={() =>
+                onQRClick(row.original.id, row.original.client_id.id, row.original.org_id.id)
+              }
+            >
               <CIcon className="ml-2" icon={cilQrCode} size="sm" />
             </CButton>
             <CButton color="warning" size="sm" className="me-1">
               <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
             </CButton>
-            <CButton color="danger" size="sm">
+            <CButton color="danger" size="sm" onClick={() => onDelete(row.original.id)}>
               <CIcon className="ml-2" icon={cilTrash} size="sm" />
             </CButton>
+            {/* <CButton color="danger" size="sm">
+              <CIcon className="ml-2" icon={cilTrash} size="sm" />
+            </CButton> */}
           </div>
         ),
       },
     ],
-    [],
+    [onDelete],
   )
 
   const table = useMaterialReactTable({

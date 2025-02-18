@@ -1,28 +1,36 @@
 import React, { useEffect, useState } from 'react'
-import {
-  CRow,
-  CCol,
-  CCard,
-  CFormInput,
-  CButton,
-  CFormCheck,
-  CCardHeader,
-  CCardBody,
-  CFormLabel,
-} from '@coreui/react'
-import { cilPlus, cilTrash } from '@coreui/icons'
+import { CCard, CButton, CCardHeader, CCardBody } from '@coreui/react'
+import { cilPlus } from '@coreui/icons'
 // import { TableViewMachine } from '../../../components/tblcomponents/CDataTable'
 import CIcon from '@coreui/icons-react'
 import { AddMachineModal } from '../../modal/AddComponentModel'
 import MachineDataTableMui from '../../../components/tblcomponents/MachineDataTableWithFilter'
-import { fetchAllData, postData } from '../../../api'
 import { useDispatch } from 'react-redux'
-import { fetchMachines } from '../../../actions/machineActions'
+import { deleteMachine, fetchMachines } from '../../../actions/machineActions'
+import Swal from 'sweetalert2'
+import QRPreviewModal from '../../modal/QRModal'
 
 const Machines = () => {
   const dispatch = useDispatch()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [data, setData] = useState([])
+  const [refresh, setRefresh] = useState(false)
+  const [isQRModalVisible, setIsQRModalVisible] = useState(false)
+  const [qrCodeData, setQrCodeData] = useState({
+    id: null,
+    clientId: null,
+    orgId: null,
+  })
+
+  const handleOpenQRModal = (id, clientId, orgId) => {
+    setQrCodeData({ id, clientId, orgId })
+    setIsQRModalVisible(true)
+  }
+
+  const handleCloseQRModal = () => {
+    setIsQRModalVisible(false)
+    setQrCodeData({ id: null, clientId: null, orgId: null })
+  }
 
   useEffect(() => {
     const getData = async () => {
@@ -34,7 +42,31 @@ const Machines = () => {
       }
     }
     getData()
-  }, [!isModalVisible])
+  }, [!isModalVisible, refresh])
+
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(deleteMachine(id))
+          Swal.fire('Deleted!', 'The machine has been deleted successfully.', 'success')
+
+          setRefresh((prev) => !prev)
+        } catch (error) {
+          console.error('Failed to delete machine:', error)
+          Swal.fire('Error!', 'Failed to delete the machine. Please try again.', 'error')
+        }
+      }
+    })
+  }
 
   return (
     <>
@@ -48,7 +80,6 @@ const Machines = () => {
                 color="info"
                 type="button"
                 onClick={() => setIsModalVisible(true)}
-                // onClick={() => console.log(data)}
                 className="btn-default text-sm"
               >
                 Add Machine&nbsp;
@@ -61,8 +92,18 @@ const Machines = () => {
         </CCardHeader>
 
         <CCardBody className="mt-4">
-          <MachineDataTableMui tableData={data} />
-          {/* <TableViewMachine /> */}
+          {/* qr modal */}
+          <QRPreviewModal
+            visible={isQRModalVisible}
+            onClose={handleCloseQRModal}
+            qrCodeData={qrCodeData} // Pass the object with the values
+          />
+          {/* dataTable */}
+          <MachineDataTableMui
+            tableData={data}
+            onDelete={handleDelete}
+            onQRClick={handleOpenQRModal}
+          />
         </CCardBody>
       </CCard>
     </>
