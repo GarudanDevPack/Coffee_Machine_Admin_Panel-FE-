@@ -25,16 +25,17 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { InputMaskCreditCard, InputMaskPhone } from '../../components/common/CInputForms'
 import { renderTimeViewClock, TimePicker } from '@mui/x-date-pickers'
 import Swal from 'sweetalert2'
-import { addMachine } from '../../actions/machineActions'
+import { addMachine, updateMachineById } from '../../actions/machineActions'
 import { useDispatch } from 'react-redux'
 import { fetchClients } from '../../actions/clientAction'
 import { fetchItemsByClient } from '../../actions/itemAction'
 
-export const AddMachineModal = ({ visible, onClose }) => {
+export const AddMachineModal = ({ visible, onClose, editData, addOREdit }) => {
   const dispatch = useDispatch()
   const [properties, setProperties] = useState([])
   const [itemData, setItemData] = useState([])
   const [clients, setClients] = useState([])
+  const [selectedId, setSelectedId] = useState('')
   const [selectedClient, setSelectedClient] = useState('')
   const [organizations, setOrganizations] = useState([])
   const [machineName, setMachineName] = useState('')
@@ -56,28 +57,66 @@ export const AddMachineModal = ({ visible, onClose }) => {
   }
 
   useEffect(() => {
-    resetForm()
-    const getClientData = async () => {
-      try {
-        const result = await dispatch(fetchClients())
-        setClients(result.data)
-      } catch (error) {
-        console.error(error)
-      }
+    console.log(addOREdit)
+    if (addOREdit) {
+      resetForm()
     }
+    if (editData) {
+      console.log(editData)
+      setSelectedId(editData.id || '')
+      setMachineName(editData.name || '')
+      setSelectedClient(editData.client_id?.id?.toString() || '')
+      setIsActive(editData.status === 'online')
+      setProperties(
+        editData.inventory?.map((item) => ({
+          item_id: item.item_id,
+          stock: item.stock.toString(),
+          qty: item.qty.toString(),
+        })) || [],
+      )
 
-    const getItemData = async () => {
-      try {
-        const result = await dispatch(fetchItemsByClient('client_id=1&org_id=1'))
-        setItemData(result.data)
-      } catch (error) {
-        console.error(error)
+      // Fetch organizations for the client in editData
+      const fetchOrganizationsForClient = async () => {
+        try {
+          const result = await dispatch(fetchClients())
+          const client = result.data.find(
+            (c) => c.id.toString() === editData.client_id.id.toString(),
+          )
+          if (client) {
+            setOrganizations(client.org)
+            setSelectedOrg(editData.org_id?.id?.toString() || '')
+          }
+        } catch (error) {
+          console.error(error)
+        }
       }
-    }
 
-    getClientData()
-    getItemData()
-  }, [])
+      fetchOrganizationsForClient()
+    } else {
+      resetForm()
+      console.log(clients)
+      const getClientData = async () => {
+        try {
+          const result = await dispatch(fetchClients())
+          setClients(result.data)
+        } catch (error) {
+          console.error(error)
+        }
+      }
+
+      const getItemData = async () => {
+        try {
+          const result = await dispatch(fetchItemsByClient('client_id=1&org_id=1'))
+          setItemData(result.data)
+        } catch (error) {
+          console.error(error)
+        }
+      }
+
+      getClientData()
+      getItemData()
+    }
+  }, [editData])
 
   // Handle client selection change
   const handleClientChange = (event) => {
@@ -115,29 +154,61 @@ export const AddMachineModal = ({ visible, onClose }) => {
   // Handle save button click
   const handleSave = async () => {
     // Construct the data object
-    const data = {
-      client_id: {
-        id: Number(selectedClient),
-        name: clients.find((c) => c.id.toString() === selectedClient)?.name || '',
-      },
-      org_id: {
-        id: Number(selectedOrg),
-        name: organizations.find((org) => org.id.toString() === selectedOrg)?.name || '',
-      },
-      name: machineName,
-      item_id: properties.map((prop) => prop.item_id),
-      status: isActive ? 'online' : 'offline',
-      last_maintenance: new Date(),
-      expire_at: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Set expire_at to 1 year from now
-      inventory: properties.map((prop) => ({
-        item_id: prop.item_id,
-        stock: Number(prop.stock),
-        qty: Number(prop.qty),
-      })),
+    let data = {}
+    if (!editData) {
+      data = {
+        client_id: {
+          id: Number(selectedClient),
+          name: clients.find((c) => c.id.toString() === selectedClient)?.name || '',
+        },
+        org_id: {
+          id: Number(selectedOrg),
+          name: organizations.find((org) => org.id.toString() === selectedOrg)?.name || '',
+        },
+        name: machineName,
+        item_id: properties.map((prop) => prop.item_id),
+        status: isActive ? 'online' : 'offline',
+        last_maintenance: new Date(),
+        expire_at: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Set expire_at to 1 year from now
+        inventory: properties.map((prop) => ({
+          item_id: prop.item_id,
+          stock: Number(prop.stock),
+          qty: Number(prop.qty),
+        })),
+      }
+    } else {
+      data = {
+        id: selectedId,
+        client_id: {
+          id: Number(selectedClient),
+          name: clients.find((c) => c.id.toString() === selectedClient)?.name || '',
+        },
+        org_id: {
+          id: Number(selectedOrg),
+          name: organizations.find((org) => org.id.toString() === selectedOrg)?.name || '',
+        },
+        name: machineName,
+        item_id: properties.map((prop) => prop.item_id),
+        status: isActive ? 'online' : 'offline',
+        last_maintenance: new Date(),
+        expire_at: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Set expire_at to 1 year from now
+        inventory: properties.map((prop) => ({
+          item_id: prop.item_id,
+          stock: Number(prop.stock),
+          qty: Number(prop.qty),
+        })),
+      }
+      //console.log('in edit mode : ', data)
     }
 
     try {
-      const response = await dispatch(addMachine(data))
+      let response = {}
+      if (!editData) {
+        response = await dispatch(addMachine(data))
+      } else {
+        response = await dispatch(updateMachineById(data))
+      }
+      console.log('responce : ',response)
       if (response) {
         Swal.fire({
           title: 'Saved!',
@@ -161,7 +232,7 @@ export const AddMachineModal = ({ visible, onClose }) => {
   return (
     <CModal alignment="center" scrollable visible={visible} onClose={onClose}>
       <CModalHeader>
-        <CModalTitle>Add Machine</CModalTitle>
+        <CModalTitle>{editData ? 'Edit Machine' : 'Add Machine'}</CModalTitle>
       </CModalHeader>
       <CModalBody>
         <CCard className="mb-4">
@@ -279,7 +350,7 @@ export const AddMachineModal = ({ visible, onClose }) => {
       </CModalBody>
       <CModalFooter>
         <CButton color="primary" onClick={handleSave}>
-          Save changes
+          {editData ? 'Update changes' : 'Save changes'}
         </CButton>
       </CModalFooter>
     </CModal>

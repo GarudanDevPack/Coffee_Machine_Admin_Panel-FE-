@@ -15,21 +15,41 @@ const Machines = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [data, setData] = useState([])
   const [refresh, setRefresh] = useState(false)
+  const [addOREdit, setAddOREdit] = useState(false)
   const [isQRModalVisible, setIsQRModalVisible] = useState(false)
   const [qrCodeData, setQrCodeData] = useState({
     id: null,
     clientId: null,
     orgId: null,
   })
+  const [editData, setEditData] = useState(null)
+
+  const handleOpenEditMachineModal = (machine) => {
+    setEditData(machine)
+    setIsModalVisible(true)
+    setAddOREdit(false)
+  }
+
+  const handleCloseEditMachineModal = () => {
+    setEditData(null)
+    setIsModalVisible(false)
+  }
 
   const handleOpenQRModal = (id, clientId, orgId) => {
     setQrCodeData({ id, clientId, orgId })
     setIsQRModalVisible(true)
+    
   }
 
   const handleCloseQRModal = () => {
     setIsQRModalVisible(false)
     setQrCodeData({ id: null, clientId: null, orgId: null })
+  }
+
+  const handeAddMachineModal = () => {
+    setEditData(null)
+    setIsModalVisible(true)
+    setAddOREdit(true)
   }
 
   useEffect(() => {
@@ -79,30 +99,35 @@ const Machines = () => {
               <CButton
                 color="info"
                 type="button"
-                onClick={() => setIsModalVisible(true)}
+                onClick={() => handeAddMachineModal()}
                 className="btn-default text-sm"
               >
                 Add Machine&nbsp;
                 <CIcon className="ml-2" icon={cilPlus} size="sm" />
               </CButton>
 
-              <AddMachineModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} />
+              <AddMachineModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                editData={editData}
+                addOREdit={addOREdit}
+              />
             </div>
           </div>
         </CCardHeader>
-
         <CCardBody className="mt-4">
           {/* qr modal */}
           <QRPreviewModal
             visible={isQRModalVisible}
             onClose={handleCloseQRModal}
-            qrCodeData={qrCodeData} // Pass the object with the values
+            qrCodeData={qrCodeData}
           />
           {/* dataTable */}
           <MachineDataTableMui
             tableData={data}
             onDelete={handleDelete}
             onQRClick={handleOpenQRModal}
+            onEditClick={handleOpenEditMachineModal}
           />
         </CCardBody>
       </CCard>

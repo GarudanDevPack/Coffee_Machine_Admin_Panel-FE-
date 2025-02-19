@@ -10,7 +10,7 @@ import CIcon from '@coreui/icons-react'
  * copyright 2025
  */
 
-export const MachineDataTableMui = ({ tableData, onDelete, onQRClick }) => {
+export const MachineDataTableMui = ({ tableData, onDelete, onQRClick, onEditClick }) => {
   const columns = useMemo(
     () => [
       // {
@@ -74,7 +74,12 @@ export const MachineDataTableMui = ({ tableData, onDelete, onQRClick }) => {
             >
               <CIcon className="ml-2" icon={cilQrCode} size="sm" />
             </CButton>
-            <CButton color="warning" size="sm" className="me-1">
+            <CButton
+              color="warning"
+              size="sm"
+              className="me-1"
+              onClick={() => onEditClick(row.original)}
+            >
               <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
             </CButton>
             <CButton color="danger" size="sm" onClick={() => onDelete(row.original.id)}>

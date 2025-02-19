@@ -5,7 +5,15 @@
  */
 
 import React, { useRef } from 'react'
-import { CButton, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react'
+import {
+  CButton,
+  CCard,
+  CModal,
+  CModalBody,
+  CModalFooter,
+  CModalHeader,
+  CModalTitle,
+} from '@coreui/react'
 import QRCode from 'react-qr-code'
 import { cilDataTransferDown } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
@@ -49,7 +57,7 @@ export const QRPreviewModal = ({ visible, onClose, qrCodeData }) => {
 
       const a = document.createElement('a')
       a.href = pngUrl
-      a.download = `${id}_qrcode.png `
+      a.download = `${id}_qrcode.png`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
@@ -70,15 +78,18 @@ export const QRPreviewModal = ({ visible, onClose, qrCodeData }) => {
             value={renderText()}
           />
         </div>
+        <div className="mt-4 d-flex justify-content-center align-items-center">
+          <p>{id}</p>
+        </div>
       </CModalBody>
       <CModalFooter>
         <CButton color="primary" onClick={downloadQRCode}>
           Download&nbsp;
           <CIcon className="ml-2" icon={cilDataTransferDown} size="sm" />
         </CButton>
-        <CButton color="danger" onClick={onClose}>
+        {/* <CButton color="danger" onClick={onClose}>
           Close
-        </CButton>
+        </CButton> */}
       </CModalFooter>
     </CModal>
   )

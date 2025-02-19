@@ -30,7 +30,14 @@ const machineReducer = (state = initialState, action) => {
         ...state,
         machines: { ...state.machines, ...action.payload },
       }
+    // case UPDATE_MACHINE_BY_ID:
     case UPDATE_MACHINE_BY_ID:
+      return {
+        ...state,
+        machinearr: state.machinearr.map((machine) =>
+          machine.id === action.payload.id ? action.payload : machine,
+        ),
+      }
     case UPDATE_MACHINE_STATUS:
       return {
         ...state,
