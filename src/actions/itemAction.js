@@ -19,6 +19,7 @@ export const fetchItemss = () => async (dispatch) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/items`)
     dispatch({ type: FETCH_ALL_ITEMS, payload: response.data })
+    return response.data
   } catch (error) {
     console.error('Error :', error)
     return null

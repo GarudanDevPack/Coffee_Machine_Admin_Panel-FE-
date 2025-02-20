@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { CCard, CButton, CCardHeader, CCardBody } from '@coreui/react'
 import { cilPlus } from '@coreui/icons'
-// import { TableViewMachine } from '../../../components/tblcomponents/CDataTable'
 import CIcon from '@coreui/icons-react'
-import { AddMachineModal } from '../../modal/AddComponentModel'
 import MachineDataTableMui from '../../../components/tblcomponents/MachineDataTableWithFilter'
 import { useDispatch } from 'react-redux'
 import { deleteMachine, fetchMachines } from '../../../actions/machineActions'
 import Swal from 'sweetalert2'
 import QRPreviewModal from '../../modal/QRModal'
+import AddMachineModal from '../../modal/MachineModal'
 
 const Machines = () => {
   const dispatch = useDispatch()
@@ -38,7 +37,6 @@ const Machines = () => {
   const handleOpenQRModal = (id, clientId, orgId) => {
     setQrCodeData({ id, clientId, orgId })
     setIsQRModalVisible(true)
-    
   }
 
   const handleCloseQRModal = () => {
@@ -51,17 +49,23 @@ const Machines = () => {
     setIsModalVisible(true)
     setAddOREdit(true)
   }
+  const getData = async () => {
+    try {
+      const result = await dispatch(fetchMachines())
+      setData(result)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   useEffect(() => {
-    const getData = async () => {
-      try {
-        const result = await dispatch(fetchMachines())
-        setData(result)
-      } catch (error) {
-        console.error(error)
-      }
-    }
     getData()
+    const interval = setInterval(() => {
+      // console.log('Function called at interval')
+      getData()
+    }, 2000)
+
+    return () => clearInterval(interval)
   }, [!isModalVisible, refresh])
 
   const handleDelete = async (id) => {

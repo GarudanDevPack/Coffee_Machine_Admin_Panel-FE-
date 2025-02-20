@@ -8,11 +8,13 @@ import { combineReducers } from 'redux'
 import machineReducer from './machineReducer'
 import clientReducer from './clientReducer'
 import itemReducer from './itemReducer'
+import uiReducer from './uiReducer'
 
 const rootReducer = combineReducers({
   machines: machineReducer,
   clients: clientReducer,
   items: itemReducer,
+  ui: uiReducer,
 })
 
 export default rootReducer

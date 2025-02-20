@@ -5,52 +5,39 @@ import { cilPenAlt, cilTrash, cilQrCode } from '@coreui/icons'
 import { CBadge } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 
-const data = [
-  {
-    id: 1,
-    itemName: 'Cappaccino',
-    itemType: 'Coffee',
-    price: '1150.00',
-    description: 'new',
-    status: 'Active',
-    createdDate: '01-01-2025',
-    updatedDate: '01-01-2025',
-  },
-  {
-    id: 2,
-    itemName: 'Expresso',
-    itemType: 'Coffee',
-    price: '1150.00',
-    description: 'new',
-    status: 'Inactive',
-    createdDate: '01-01-2025',
-    updatedDate: '01-01-2025',
-  },
-]
-
-export const ItemDataTableMui = () => {
+export const ItemDataTableMui = ({ tableData }) => {
   // Columns should be memoized or stable
   const columns = useMemo(
     () => [
+      // {
+      //   accessorKey: 'id',
+      //   header: '#',
+      //   size: 50,
+      // },
       {
-        accessorKey: 'id',
-        header: '#',
-        size: 50,
-      },
-      {
-        accessorKey: 'itemName',
+        accessorKey: 'name',
         header: 'Item Name',
         size: 150,
       },
-      {
-        accessorKey: 'itemType',
-        header: 'Item Type',
-        size: 150,
-      },
+      // {
+      //   accessorKey: 'itemType',
+      //   header: 'Item Type',
+      //   size: 150,
+      // },
       {
         accessorKey: 'price',
         header: 'Price',
         size: 150,
+      },
+      {
+        accessorKey: 'nozzle',
+        header: 'Nozzle Number',
+        size: 100,
+        Cell: ({ cell }) => (
+          <div className="d-flex justify-content-center">
+            <CBadge color="info">{cell.getValue()}</CBadge>
+          </div>
+        ),
       },
       {
         accessorKey: 'description',
@@ -58,22 +45,12 @@ export const ItemDataTableMui = () => {
         size: 150,
       },
       {
-        accessorKey: 'status',
-        header: 'Status',
-        size: 100,
-        Cell: ({ cell }) => (
-          <CBadge color={cell.getValue() === 'Active' ? 'info' : 'danger'}>
-            {cell.getValue()}
-          </CBadge>
-        ),
-      },
-      {
-        accessorKey: 'createdDate',
+        accessorKey: 'createdAt',
         header: 'Created Date',
         size: 150,
       },
       {
-        accessorKey: 'updatedDate',
+        accessorKey: 'updatedAt',
         header: 'Updated Date',
         size: 150,
       },
@@ -98,7 +75,7 @@ export const ItemDataTableMui = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data, // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    data: tableData.data || [],
   })
 
   return <MaterialReactTable table={table} />

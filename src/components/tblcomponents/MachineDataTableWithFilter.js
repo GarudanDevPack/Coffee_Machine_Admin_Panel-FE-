@@ -52,10 +52,15 @@ export const MachineDataTableMui = ({ tableData, onDelete, onQRClick, onEditClic
         accessorKey: 'error',
         header: 'Description',
         size: 150,
+        Cell: ({ cell }) => (
+          <span style={{ color: cell.getValue() === 'STATE_READY' ? 'green' : 'red' }}>
+            {cell.getValue()}
+          </span>
+        ),
       },
       {
-        accessorKey: 'createdAt',
-        header: 'Created Date',
+        accessorKey: 'updatedAt',
+        header: 'Updated Date',
         size: 150,
       },
       {

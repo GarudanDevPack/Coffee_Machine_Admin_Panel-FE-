@@ -1,16 +1,12 @@
-import React, { useState } from 'react'
-import { CCard, CButton, CCardHeader, CCardBody, CFormInput, CFormSelect } from '@coreui/react'
-import { cilPlus, cilFilter } from '@coreui/icons'
-import {
-  TableViewCustomer,
-  TableViewCustomerWithFilter,
-  TableViewCustomerWithPagination,
-} from '../../../components/tblcomponents/CDataTable'
+import React, { useEffect, useState } from 'react'
+import { CCard, CButton, CCardHeader, CCardBody } from '@coreui/react'
+import { cilPlus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import { AddCustomerWalletModal, AddItemModal } from '../../modal/AddComponentModel'
-import { CustomerWalletDataTableMui } from '../../../components/tblcomponents/CustomerWalletsTableWithFilter'
+// import { AddCustomerWalletModal, AddItemModal } from '../../modal/AddComponentModel'
 import ItemDataTableMui from '../../../components/tblcomponents/ItemTableWithFilter'
-// import ItemDataTableMui from '../../../components/tblcomponents/ItemTableWithFilter'
+import AddItemModal from '../../modal/ItemModal'
+import { useDispatch } from 'react-redux'
+import { fetchItemss } from '../../../actions/itemAction'
 
 /**
  * author Anushka Isuru Lakmal
@@ -20,6 +16,27 @@ import ItemDataTableMui from '../../../components/tblcomponents/ItemTableWithFil
 
 const Items = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const dispatch = useDispatch()
+  const [data, setData] = useState([])
+
+  const getData = async () => {
+    try {
+      const result = await dispatch(fetchItemss())
+      setData(result)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    getData()
+    const interval = setInterval(() => {
+      // console.log('Function called at interval')
+      getData()
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [!isModalVisible])
 
   // Function to save the last time the tab was left
   function saveLastLeftTime() {
@@ -89,8 +106,7 @@ const Items = () => {
         </CCardHeader>
 
         <CCardBody className="mt-4">
-          {/* <CustomerWalletDataTableMui /> */}
-          <ItemDataTableMui />
+          <ItemDataTableMui tableData={data} />
         </CCardBody>
       </CCard>
     </>
