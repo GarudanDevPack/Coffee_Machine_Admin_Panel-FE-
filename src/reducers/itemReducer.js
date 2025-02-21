@@ -14,7 +14,8 @@ import {
 } from '../actions/types'
 
 const initialState = {
-  items: [],
+  items: {},
+  itemsarr: [],
   iteme: null,
 }
 
@@ -38,7 +39,7 @@ const itemReducer = (state = initialState, action) => {
     case ADD_ITEM:
       return {
         ...state,
-        items: [...state.items, action.payload],
+        items: {...state.items, ...action.payload},
       }
     case UPDATE_ITEM_BY_ID:
     case DELETE_ITEM:

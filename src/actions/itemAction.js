@@ -47,9 +47,11 @@ export const fetchItemsByClient = (client_id) => async (dispatch) => {
   }
 }
 
-export const addItem = (item) => async (dispatch) => {
+export const addItem = (items) => async (dispatch) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/createitem`, item)
+    console.log(items)
+    const response = await axios.post(`${API_BASE_URL}/createitem`, items)
+    console.log("itemAction : ", response.data)
     dispatch({ type: ADD_ITEM, payload: response.data })
     return response.data
   } catch (error) {
