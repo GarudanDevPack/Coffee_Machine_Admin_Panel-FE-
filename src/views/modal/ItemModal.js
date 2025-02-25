@@ -24,11 +24,15 @@ import {
 } from '@coreui/react'
 import { useDispatch } from 'react-redux'
 import { fetchClients } from '../../actions/clientAction'
-import { fetchItemsTypes } from '../../actions/types/itemTypeAction'
+import {
+  fetchItemsTypes,
+  fetchItemTypeById,
+  updateItemTypeById,
+} from '../../actions/types/itemTypeAction'
 import Swal from 'sweetalert2'
 import { addItem } from '../../actions/itemAction'
 
-const AddItemModal = ({ visible, onClose }) => {
+const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
   const [properties, setProperties] = useState([])
   const [images, setImages] = useState([])
   const dispatch = useDispatch()
@@ -36,6 +40,7 @@ const AddItemModal = ({ visible, onClose }) => {
   const [organizations, setOrganizations] = useState([])
   const [itemTypes, setItemTypes] = useState([])
   const [nozzles, setNozzles] = useState([])
+  const [selectedId, setSelectedId] = useState('')
   const [selectedClient, setSelectedClient] = useState('')
   const [selectedOrg, setSelectedOrg] = useState('')
   const [selectedItemType, setSelectedItemType] = useState('')
@@ -47,77 +52,112 @@ const AddItemModal = ({ visible, onClose }) => {
 
   useEffect(() => {
     //resetForm()
-    const getClientData = async () => {
-      try {
-        const result = await dispatch(fetchClients())
-        // console.log(result.data)
-        setClients(result.data)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-    const getItemTypesData = async () => {
-      try {
-        const res = await dispatch(fetchItemsTypes())
-        // console.log(res.data)
-        setItemTypes(res.data)
-      } catch (error) {
-        console.error(error)
-      }
-    }
+    if (editData) {
+      //console.log(editData)
+      setSelectedId(editData.id || '')
+      setItemName(editData.name || '')
+      setSelectedClient(editData.client_id?.toString() || '')
+      setPrice(editData.price || '')
+      setNozzles(editData.nozzle || '')
+      setDescription(editData.description || '')
 
-    getClientData()
-    getItemTypesData()
-  }, [])
+      const getItemTypesData = async () => {
+        try {
+          const res = await dispatch(fetchItemTypeById(editData.item_type_id?.toString()))
+          console.log(res.data)
+          setItemTypes(res.data)
+        } catch (error) {
+          console.error(error)
+        }
+      }
+      // Fetch organizations for the client in editData
+      const fetchOrganizationsForClient = async () => {
+        try {
+          const result = await dispatch(fetchClients())
+          //console.log(result.data)
+          const client = result.data.find((c) => c.id.toString() === editData.client_id.toString())
+          //console.log(client)
+          if (client) {
+            setOrganizations(client.org)
+            setSelectedOrg(editData.org_id?.toString() || '')
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      }
+      getItemTypesData()
+      fetchOrganizationsForClient()
+    } else {
+      console.log('new')
+      const getClientData = async () => {
+        try {
+          const result = await dispatch(fetchClients())
+          // console.log(result.data)
+          setClients(result.data)
+        } catch (error) {
+          console.error(error)
+        }
+      }
+      const getItemTypesData = async () => {
+        try {
+          const res = await dispatch(fetchItemsTypes())
+          // console.log(res.data)
+          setItemTypes(res.data)
+        } catch (error) {
+          console.error(error)
+        }
+      }
+
+      getClientData()
+      getItemTypesData()
+    }
+  }, [editData])
 
   const handleSave = async () => {
     // Construct the data object
     let data = {}
-    //if (!editData) {
-    data = {
-      client_id: Number(selectedClient),
-      org_id: Number(selectedOrg),
-      name: itemName,
-      price: Number(price),
-      item_size: "full",
-      item_type_id: selectedItemType,
-      nozzle: Number(selectedNozzle),
-      description: description,
-      rate: 1,
+    if (!editData) {
+      data = {
+        client_id: Number(selectedClient),
+        org_id: Number(selectedOrg),
+        name: itemName,
+        price: Number(price),
+        item_size: 'full',
+        item_type: {
+          id: String(selectedItemType),
+          name: itemTypes.find((type) => type.id.toString() === selectedItemType)?.name || '',
+        },
+        nozzle: Number(selectedNozzle),
+        description: description,
+        rate: 1,
+      }
+    } else {
+      data = {
+        id: selectedId,
+        client_id: Number(selectedClient),
+        org_id: Number(selectedOrg),
+        name: itemName,
+        price: Number(price),
+        item_size: 'full',
+        item_type: {
+          id: String(selectedItemType),
+          name: itemTypes.find((type) => type.id.toString() === selectedItemType)?.name || '',
+        },
+        nozzle: Number(selectedNozzle),
+        description: description,
+        rate: 1,
+      }
+      //console.log('in edit mode : ', data)
     }
-    // } else {
-    //   data = {
-    //     id: selectedId,
-    //     client_id: {
-    //       id: Number(selectedClient),
-    //       name: clients.find((c) => c.id.toString() === selectedClient)?.name || '',
-    //     },
-    //     org_id: {
-    //       id: Number(selectedOrg),
-    //       name: organizations.find((org) => org.id.toString() === selectedOrg)?.name || '',
-    //     },
-    //     name: machineName,
-    //     item_id: properties.map((prop) => prop.item_id),
-    //     status: isActive ? 'online' : 'offline',
-    //     last_maintenance: new Date(),
-    //     expire_at: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Set expire_at to 1 year from now
-    //     inventory: properties.map((prop) => ({
-    //       item_id: prop.item_id,
-    //       stock: Number(prop.stock),
-    //       qty: Number(prop.qty),
-    //     })),
-    //   }
-    //   //console.log('in edit mode : ', data)
-    //}
 
     try {
       let response = {}
-      //if (!editData) {
-      console.log(data)
-      response = await dispatch(addItem(data))
-      // } else {
-      //   response = await dispatch(updateMachineById(data))
-      // }
+      if (!editData) {
+        console.log(data)
+        response = await dispatch(addItem(data))
+      } else {
+        response = await dispatch(updateItemTypeById(data))
+      }
       // console.log('responce : ', response)
       if (response) {
         Swal.fire({
@@ -291,21 +331,6 @@ const AddItemModal = ({ visible, onClose }) => {
                   </CFormSelect>
                 </CCol>
               </div>
-              {/* <div className="mt-2" md={12}>
-                <CCol>
-                  <CFormLabel>Item Size</CFormLabel>
-                </CCol>
-                <CCol>
-                  <CFormSelect aria-label="Default select example">
-                    <option>- Select -</option>
-                    <option value="1">CUS-00001 John</option>
-                    <option value="2">CUS-00011 Mark</option>
-                    <option value="3" disabled>
-                      CUS-00011 Kane
-                    </option>
-                  </CFormSelect>
-                </CCol>
-              </div> */}
               <div className="mt-2" md={12}>
                 <CCol>
                   <CFormLabel>Item Nozzle</CFormLabel>

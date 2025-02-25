@@ -34,3 +34,7 @@ export const FETCH_ITEM_TYPE_BY_ID = 'FETCH_ITEM_TYPE_BY_ID'
 export const ADD_ITEM_TYPE = 'ADD_ITEM_TYPE'
 export const DELETE_ITEM_TYPE = 'DELETE_ITEM_TYPE'
 export const UPDATE_ITEM_TYPE_BY_ID = 'UPDATE_ITEM_TYPE_BY_ID'
+
+//orders-sales
+export const FETCH_ALL_ORDERS = 'FETCH_ALL_ORDERS'
+export const FETCH_SALES_BY_ID = 'FETCH_SALES_BY_ID'

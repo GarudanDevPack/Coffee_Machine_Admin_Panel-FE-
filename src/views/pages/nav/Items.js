@@ -6,7 +6,8 @@ import CIcon from '@coreui/icons-react'
 import ItemDataTableMui from '../../../components/tblcomponents/ItemTableWithFilter'
 import AddItemModal from '../../modal/ItemModal'
 import { useDispatch } from 'react-redux'
-import { fetchItemss } from '../../../actions/itemAction'
+import { deleteItem, fetchItemss } from '../../../actions/itemAction'
+import Swal from 'sweetalert2'
 
 /**
  * author Anushka Isuru Lakmal
@@ -18,6 +19,8 @@ const Items = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const dispatch = useDispatch()
   const [data, setData] = useState([])
+  const [addOREdit, setAddOREdit] = useState(false)
+  const [editData, setEditData] = useState(null)
 
   const getData = async () => {
     try {
@@ -81,6 +84,38 @@ const Items = () => {
     }
   })
 
+  const handleOpenEditItemModal = (item) => {
+    //console.log(item)
+    setEditData(item)
+    setIsModalVisible(true)
+    setAddOREdit(false)
+  }
+
+  const handleDelete = async (id) => {
+    //console.log(id)
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(deleteItem(id))
+          Swal.fire('Deleted!', 'The machine has been deleted successfully.', 'success')
+
+          setRefresh((prev) => !prev)
+        } catch (error) {
+          console.error('Failed to delete machine:', error)
+          Swal.fire('Error!', 'Failed to delete the machine. Please try again.', 'error')
+        }
+      }
+    })
+  }
+
   return (
     <>
       <CCard className="mb-4">
@@ -100,13 +135,22 @@ const Items = () => {
                 Add New Item&nbsp;
                 <CIcon className="ml-2" icon={cilPlus} size="sm" />
               </CButton>
-              <AddItemModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} />
+              <AddItemModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                editData={editData}
+                addOREdit={addOREdit}
+              />
             </div>
           </div>
         </CCardHeader>
 
         <CCardBody className="mt-4">
-          <ItemDataTableMui tableData={data} />
+          <ItemDataTableMui
+            tableData={data}
+            onDelete={handleDelete}
+            //onEditClick={handleOpenEditItemModal}
+          />
         </CCardBody>
       </CCard>
     </>

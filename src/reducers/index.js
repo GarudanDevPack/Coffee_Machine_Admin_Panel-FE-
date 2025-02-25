@@ -10,11 +10,13 @@ import clientReducer from './clientReducer'
 import itemReducer from './itemReducer'
 import uiReducer from './uiReducer'
 import itemTypeReducer from './types/itemtypeReducer'
+import salesReducer from './salesRudecer'
 
 const rootReducer = combineReducers({
   machines: machineReducer,
   clients: clientReducer,
   items: itemReducer,
+  sales: salesReducer,
   itemTypes: itemTypeReducer,
   ui: uiReducer,
 })

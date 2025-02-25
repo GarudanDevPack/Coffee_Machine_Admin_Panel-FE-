@@ -27,7 +27,7 @@ export const fetchItemsTypes = () => async (dispatch) => {
 
 export const fetchItemTypeById = (id) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getitemtype/${id}`)
+    const response = await axios.get(`${API_BASE_URL}/getitemtype?id=${id}`)
     dispatch({ type: FETCH_ITEM_TYPE_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
