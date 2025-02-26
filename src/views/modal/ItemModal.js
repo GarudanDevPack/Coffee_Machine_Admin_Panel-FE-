@@ -30,7 +30,7 @@ import {
   updateItemTypeById,
 } from '../../actions/types/itemTypeAction'
 import Swal from 'sweetalert2'
-import { addItem } from '../../actions/itemAction'
+import { addItem, updateItemById } from '../../actions/itemAction'
 
 const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
   const [properties, setProperties] = useState([])
@@ -50,49 +50,71 @@ const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
   const [description, setDescription] = useState('')
   const [isActive, setIsActive] = useState(false)
 
+  const resetForm = () => {
+    setProperties([])
+    setClients([])
+    setOrganizations([])
+    setItemTypes([])
+    setSelectedId('')
+    setSelectedClient('')
+    setSelectedOrg('')
+    setSelectedItemType('')
+    setItemName('')
+    setPrice('')
+    setSelectedNozzle('')
+    setDescription('')
+    setIsActive(false)
+  }
+
   useEffect(() => {
-    //resetForm()
+    // console.log(addOREdit)
+    if (addOREdit) {
+      resetForm()
+    }
+
     if (editData) {
-      //console.log(editData)
+      console.log(editData.nozzle)
       setSelectedId(editData.id || '')
       setItemName(editData.name || '')
-      setSelectedClient(editData.client_id?.toString() || '')
+      setSelectedClient(editData.client_id?.id?.toString() || '')
       setPrice(editData.price || '')
-      setNozzles(editData.nozzle || '')
+      setSelectedNozzle(editData.nozzle || '')
       setDescription(editData.description || '')
 
-      const getItemTypesData = async () => {
-        try {
-          const res = await dispatch(fetchItemTypeById(editData.item_type_id?.toString()))
-          console.log(res.data)
-          setItemTypes(res.data)
-        } catch (error) {
-          console.error(error)
-        }
-      }
+      setSelectedItemType(editData.item_type?.id || '')
+      // console.log('slected: ',item)
+
+      // const getItemTypesData = async () => {
+      //   try {
+      //     //console.log(editData.item_type?.id)
+      //     const res = await dispatch(fetchItemTypeById(editData.item_type?.id.toString()))
+      //     setSelectedItemType(res.data)
+      //     console.log(res.data)
+      //   } catch (error) {
+      //     console.error(error)
+      //   }
+      // }
       // Fetch organizations for the client in editData
       const fetchOrganizationsForClient = async () => {
         try {
           const result = await dispatch(fetchClients())
-          //console.log(result.data)
-          const client = result.data.find((c) => c.id.toString() === editData.client_id.toString())
-          //console.log(client)
+          const client = result.data.find(
+            (c) => c.id.toString() === editData.client_id.id.toString(),
+          )
           if (client) {
             setOrganizations(client.org)
-            setSelectedOrg(editData.org_id?.toString() || '')
+            setSelectedOrg(editData.org_id?.id?.toString() || '')
           }
         } catch (error) {
           console.error(error)
         }
       }
-      getItemTypesData()
+      // getItemTypesData()
       fetchOrganizationsForClient()
     } else {
-      console.log('new')
       const getClientData = async () => {
         try {
           const result = await dispatch(fetchClients())
-          // console.log(result.data)
           setClients(result.data)
         } catch (error) {
           console.error(error)
@@ -101,7 +123,6 @@ const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
       const getItemTypesData = async () => {
         try {
           const res = await dispatch(fetchItemsTypes())
-          // console.log(res.data)
           setItemTypes(res.data)
         } catch (error) {
           console.error(error)
@@ -111,73 +132,8 @@ const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
       getClientData()
       getItemTypesData()
     }
-  }, [editData])
+  }, [editData, visible])
 
-  const handleSave = async () => {
-    // Construct the data object
-    let data = {}
-    if (!editData) {
-      data = {
-        client_id: Number(selectedClient),
-        org_id: Number(selectedOrg),
-        name: itemName,
-        price: Number(price),
-        item_size: 'full',
-        item_type: {
-          id: String(selectedItemType),
-          name: itemTypes.find((type) => type.id.toString() === selectedItemType)?.name || '',
-        },
-        nozzle: Number(selectedNozzle),
-        description: description,
-        rate: 1,
-      }
-    } else {
-      data = {
-        id: selectedId,
-        client_id: Number(selectedClient),
-        org_id: Number(selectedOrg),
-        name: itemName,
-        price: Number(price),
-        item_size: 'full',
-        item_type: {
-          id: String(selectedItemType),
-          name: itemTypes.find((type) => type.id.toString() === selectedItemType)?.name || '',
-        },
-        nozzle: Number(selectedNozzle),
-        description: description,
-        rate: 1,
-      }
-      //console.log('in edit mode : ', data)
-    }
-
-    try {
-      let response = {}
-      if (!editData) {
-        console.log(data)
-        response = await dispatch(addItem(data))
-      } else {
-        response = await dispatch(updateItemTypeById(data))
-      }
-      // console.log('responce : ', response)
-      if (response) {
-        Swal.fire({
-          title: 'Saved!',
-          text: 'Item is saved successfully!',
-          icon: 'success',
-        })
-        //resetForm()
-        onClose() // Close the modal
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Something went wrong!',
-        })
-      }
-    } catch (error) {
-      console.error('Error saving data:', error)
-    }
-  }
   // Handle client selection change
   const handleClientChange = (event) => {
     const clientId = event.target.value
@@ -233,8 +189,82 @@ const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
   }
 
   function updateImagesOrder(images) {
-    //console.log(arguments);
     setImages(images)
+  }
+
+  const handleSave = async () => {
+    let data = {}
+    if (!editData) {
+      data = {
+        client_id: {
+          id: Number(selectedClient),
+          name: clients.find((type) => type.id.toString() === selectedClient)?.name || '',
+        },
+        org_id: {
+          id: Number(selectedOrg),
+          name: organizations.find((type) => type.id.toString() === selectedOrg)?.name || '',
+        },
+        name: itemName,
+        price: Number(price),
+        item_size: 'full',
+        item_type: {
+          id: String(selectedItemType),
+          name: itemTypes.find((type) => type.id.toString() === selectedItemType)?.name || '',
+        },
+        nozzle: Number(selectedNozzle),
+        description: description,
+        rate: 1,
+      }
+    } else {
+      data = {
+        id: selectedId,
+        client_id: {
+          id: Number(selectedClient),
+          name: clients.find((type) => type.id.toString() === selectedClient)?.name || '',
+        },
+        org_id: {
+          id: Number(selectedOrg),
+          name: organizations.find((type) => type.id.toString() === selectedOrg)?.name || '',
+        },
+        name: itemName,
+        price: Number(price),
+        item_size: 'full',
+        item_type: {
+          id: String(selectedItemType),
+          name: itemTypes.find((type) => type.id.toString() === selectedItemType)?.name || '',
+        },
+        nozzle: Number(selectedNozzle),
+        description: description,
+        rate: 1,
+      }
+    }
+
+    try {
+      let response = {}
+      if (!editData) {
+        response = await dispatch(addItem(data))
+      } else {
+        console.log(data)
+        response = await dispatch(updateItemById(data))
+      }
+      if (response) {
+        Swal.fire({
+          title: 'Saved!',
+          text: 'Item is saved successfully!',
+          icon: 'success',
+        })
+        resetForm()
+        onClose() // Close the modal
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+        })
+      }
+    } catch (error) {
+      console.error('Error saving data:', error)
+    }
   }
 
   return (
@@ -323,6 +353,16 @@ const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
                     onChange={handleItemTypeChange}
                   >
                     <option>- Select -</option>
+                    {/* {Array.isArray(itemTypes) ? (
+                      itemTypes.map((type) => (
+                        <option key={type.id} value={type.name}>
+                          {type.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>Loading...</option>
+                    )} */}
+
                     {itemTypes.map((item) => (
                       <option key={item.id} value={item.id}>
                         {item.name}

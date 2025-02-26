@@ -19,6 +19,7 @@ const Items = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const dispatch = useDispatch()
   const [data, setData] = useState([])
+  const [refresh, setRefresh] = useState(false)
   const [addOREdit, setAddOREdit] = useState(false)
   const [editData, setEditData] = useState(null)
 
@@ -39,7 +40,7 @@ const Items = () => {
     }, 2000)
 
     return () => clearInterval(interval)
-  }, [!isModalVisible])
+  }, [!isModalVisible, refresh])
 
   // Function to save the last time the tab was left
   function saveLastLeftTime() {
@@ -149,7 +150,7 @@ const Items = () => {
           <ItemDataTableMui
             tableData={data}
             onDelete={handleDelete}
-            //onEditClick={handleOpenEditItemModal}
+            onEditClick={handleOpenEditItemModal}
           />
         </CCardBody>
       </CCard>

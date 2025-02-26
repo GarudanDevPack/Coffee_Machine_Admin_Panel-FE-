@@ -51,7 +51,7 @@ export const addMachine = (machines) => async (dispatch) => {
 export const updateMachineById = (machine) => async (dispatch) => {
   try {
     const response = await axios.put(`${API_BASE_URL}/updatemachinelog`, machine)
-    console.log('Action response : ', response)
+    // console.log('Action response : ', response)
     dispatch({ type: UPDATE_MACHINE_BY_ID, payload: response.data })
     return response.data
   } catch (error) {

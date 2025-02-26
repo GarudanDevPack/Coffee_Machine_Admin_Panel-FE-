@@ -53,6 +53,7 @@ const Machines = () => {
     try {
       const result = await dispatch(fetchMachines())
       setData(result)
+      
     } catch (error) {
       console.error(error)
     }

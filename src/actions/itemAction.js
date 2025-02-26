@@ -13,6 +13,7 @@ import {
   FETCH_ITEM_BY_CLIENT,
   FETCH_ITEM_BY_ID,
   UPDATE_ITEM_BY_ID,
+  UPDATE_ITEM_TYPE_BY_ID,
 } from './types'
 
 export const fetchItemss = () => async (dispatch) => {
@@ -49,9 +50,7 @@ export const fetchItemsByClient = (client_id) => async (dispatch) => {
 
 export const addItem = (items) => async (dispatch) => {
   try {
-    console.log(items)
     const response = await axios.post(`${API_BASE_URL}/createitem`, items)
-    console.log("itemAction : ", response.data)
     dispatch({ type: ADD_ITEM, payload: response.data })
     return response.data
   } catch (error) {
@@ -60,13 +59,26 @@ export const addItem = (items) => async (dispatch) => {
   }
 }
 
-export const updateItemById = (id) => async (dispatch) => {
+// export const updateItemById = (item) => async (dispatch) => {
+//   try {
+//     const response = await axios.put(`${API_BASE_URL}/updateitem`, item)
+//     console.log(response)
+//     dispatch({ type: UPDATE_ITEM_BY_ID, payload: response.data })
+//     return response.data
+//   } catch (error) {
+//     console.error('Error :', error)
+//     return null
+//   }
+// }
+
+export const updateItemById = (item) => async (dispatch) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/updateitem/${id}`)
+    const response = await axios.put(`${API_BASE_URL}/updateitem`, item)
+    // console.log('Action response : ', response)
     dispatch({ type: UPDATE_ITEM_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
-    console.error('Error :', error)
+    console.error('Error adding machine:', error)
     return null
   }
 }
@@ -76,7 +88,7 @@ export const deleteItem = (id) => async (dispatch) => {
     await axios.delete(`${API_BASE_URL}/deleteitem?id=${id}`)
     dispatch({ type: DELETE_ITEM, payload: id })
   } catch (error) {
-    console.error('Error adding machine:', error)
+    console.error('Error :', error)
     return null
   }
 }

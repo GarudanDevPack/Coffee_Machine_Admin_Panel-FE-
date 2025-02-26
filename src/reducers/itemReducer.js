@@ -16,7 +16,7 @@ import {
 const initialState = {
   items: {},
   itemsarr: [],
-  iteme: null,
+  item: null,
 }
 
 const itemReducer = (state = initialState, action) => {
@@ -39,13 +39,21 @@ const itemReducer = (state = initialState, action) => {
     case ADD_ITEM:
       return {
         ...state,
-        items: {...state.items, ...action.payload},
+        items: { ...state.items, ...action.payload },
       }
+    //case UPDATE_ITEM_BY_ID:
+    // case UPDATE_MACHINE_BY_ID:
     case UPDATE_ITEM_BY_ID:
+      return {
+        ...state,
+        itemsarr: state.itemsarr.map((item) =>
+          item.id === action.payload.id ? action.payload : item,
+        ),
+      }
     case DELETE_ITEM:
       return {
         ...state,
-        items: state.items.filter((item) => item.id !== action.payload),
+        itemsarr: state.itemsarr.filter((item) => item.id !== action.payload),
       }
     default:
       return state

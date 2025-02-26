@@ -80,7 +80,7 @@ export const ItemDataTableMui = ({ tableData, onDelete, onEditClick }) => {
               color="warning"
               size="sm"
               className="me-1"
-              //onClick={() => onEditClick(row.original)}
+              onClick={() => onEditClick(row.original)}
             >
               <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
             </CButton>
