@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { CBadge, CButton } from '@coreui/react' // Import CoreUI buttons if needed
-import { cilPenAlt, cilTrash, cilQrCode } from '@coreui/icons'
+import { cilPenAlt, cilTrash, cilQrCode, cilColorFill, cilAudio } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
 /**
@@ -68,7 +68,7 @@ export const MachineDataTableMui = ({ tableData, onDelete, onQRClick, onEditClic
         header: 'Updated Date',
         size: 150,
         Cell: ({ row }) => {
-          const date = new Date(row.original.updatedAt);
+          const date = new Date(row.original.updatedAt)
           return date
             .toLocaleString('en-GB', {
               day: '2-digit',
@@ -78,13 +78,38 @@ export const MachineDataTableMui = ({ tableData, onDelete, onQRClick, onEditClic
               minute: '2-digit',
               hour12: true,
             })
-            .replace(',', ''); // Remove the comma
+            .replace(',', '') // Remove the comma
         },
-      },      
+      },
+      {
+        id: 'machine_actions', // Custom column for actions
+        header: 'Machine Action',
+        size: 100,
+        Cell: ({ row }) => (
+          <div>
+            <CButton
+              color="warning"
+              size="sm"
+              className="me-1"
+              //onClick={() => onEditClick(row.original)}
+            >
+              <CIcon className="ml-2" icon={cilColorFill} size="sm" />
+            </CButton>
+            <CButton
+              color="warning"
+              size="sm"
+              className="me-1"
+              //onClick={() => onEditClick(row.original)}
+            >
+              <CIcon className="ml-2" icon={cilAudio} size="sm" />
+            </CButton>
+          </div>
+        ),
+      },
       {
         id: 'actions', // Custom column for actions
         header: 'Action',
-        size: 200,
+        size: 150,
         Cell: ({ row }) => (
           <div>
             <CButton
@@ -105,6 +130,7 @@ export const MachineDataTableMui = ({ tableData, onDelete, onQRClick, onEditClic
             >
               <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
             </CButton>
+
             <CButton color="danger" size="sm" onClick={() => onDelete(row.original.id)}>
               <CIcon className="ml-2" icon={cilTrash} size="sm" />
             </CButton>

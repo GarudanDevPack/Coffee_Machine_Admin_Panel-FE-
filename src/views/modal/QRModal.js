@@ -24,7 +24,8 @@ export const QRPreviewModal = ({ visible, onClose, qrCodeData }) => {
   const qrRef = useRef(null)
 
   const renderText = () => {
-    return `${id ? `${id}/` : ''}${clientId ? `${clientId}/` : ''}${orgId ? `${orgId}` : ''}`
+    // return `${id ? `${id}/` : ''}${clientId ? `${clientId}/` : ''}${orgId ? `${orgId}` : ''}`
+    return `${id ? `${id}` : ''}`
   }
   const downloadQRCode = () => {
     const svg = qrRef.current?.querySelector('svg')
