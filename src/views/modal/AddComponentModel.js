@@ -263,7 +263,7 @@ export const AddBrewStockModal = ({ visible, onClose }) => {
                   </CFormSelect>
                 </CCol>
               </div>
-              <div className="mt-2" md={12}>
+              {/* <div className="mt-2" md={12}>
                 <CCol>
                   <CFormLabel>Outlet Name</CFormLabel>
                 </CCol>
@@ -277,7 +277,7 @@ export const AddBrewStockModal = ({ visible, onClose }) => {
                     </option>
                   </CFormSelect>
                 </CCol>
-              </div>
+              </div> */}
               <CCol xs={12} md={12} className="mt-3">
                 <div className="mb-2">
                   <CRow>

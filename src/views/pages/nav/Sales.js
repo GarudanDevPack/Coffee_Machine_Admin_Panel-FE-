@@ -3,6 +3,7 @@ import { CCard, CCardHeader, CCardBody } from '@coreui/react'
 import ViewSalesDataTableMui from '../../../components/tblcomponents/ViewSalesDataTableWithFilter'
 import { fetchSales } from '../../../actions/salesAction'
 import { useDispatch } from 'react-redux'
+// import { io } from 'socket.io-client'
 
 /**
  * author Anushka Isuru Lakmal
@@ -15,22 +16,55 @@ const SalesReporting = () => {
   const dispatch = useDispatch()
   const [data, setData] = useState([])
 
+  // const API_URL = 'http://localhost:5000/api'
+  // let socket;
+
+  // const connectSocket = () => {
+  //   socket = io('http://localhost:5000', {
+  //     auth: { token }
+  //   });
+  //   return socket;
+  // };
+  // const connectSocket = () => {
+  //   socket = io('http://localhost:5000');
+  //   return socket;
+  // };
+
+  // const getOrders = async () => {
+  //   const response = await fetch(`${API_URL}/orders`);
+  //   console.log('socket data : ',response)
+  //   return await response.json();
+  // };
+
+  // connectSocket();
+
+  // useEffect(() => {
+  //   const socket = connectSocket();
+  //   getOrders()
+  //   // socket.on('new_order', (newOrder) => {
+  //   //   setOrders(prev => [newOrder, ...prev]);
+  //   // });
+
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
 
   const getData = async () => {
     try {
       const result = await dispatch(fetchSales())
       setData(result)
-      //console.log(result)
     } catch (error) {
       console.error(error)
     }
   }
 
+
   useEffect(() => {
     getData()
     const interval = setInterval(() => {
       getData()
-    }, 2000)
+    }, 500)
 
     return () => clearInterval(interval)
   }, [!isModalVisible])
@@ -54,3 +88,4 @@ const SalesReporting = () => {
 }
 
 export default SalesReporting
+//

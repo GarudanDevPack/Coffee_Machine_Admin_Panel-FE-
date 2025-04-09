@@ -186,11 +186,11 @@ const AddMachineModal = ({ visible, onClose, editData, addOREdit }) => {
         status: isActive ? 'online' : 'offline',
         last_maintenance: new Date(),
         expire_at: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Set expire_at to 1 year from now
-        inventory: properties.map((prop) => ({
-          item_id: prop.item_id,
-          stock: Number(prop.stock),
-          qty: Number(prop.qty),
-        })),
+        // inventory: properties.map((prop) => ({
+        //   item_id: prop.item_id,
+        //   stock: Number(prop.stock),
+        //   qty: Number(prop.qty),
+        // })),
       }
     } else {
       data = {
@@ -208,11 +208,11 @@ const AddMachineModal = ({ visible, onClose, editData, addOREdit }) => {
         status: isActive ? 'online' : 'offline',
         last_maintenance: new Date(),
         expire_at: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Set expire_at to 1 year from now
-        inventory: properties.map((prop) => ({
-          item_id: prop.item_id,
-          stock: Number(prop.stock),
-          qty: Number(prop.qty),
-        })),
+        // inventory: properties.map((prop) => ({
+        //   item_id: prop.item_id,
+        //   stock: Number(prop.stock),
+        //   qty: Number(prop.qty),
+        // })),
       }
       //console.log('in edit mode : ', data)
     }
@@ -302,7 +302,7 @@ const AddMachineModal = ({ visible, onClose, editData, addOREdit }) => {
                   onChange={handleMachineNameChange}
                 />
               </CCol>
-              <CCol xs={12} md={12} className="mt-3">
+              {/* <CCol xs={12} md={12} className="mt-3">
                 <div className="mb-2">
                   <CRow>
                     <CFormLabel className="mb-3">Inventory</CFormLabel>
@@ -352,15 +352,15 @@ const AddMachineModal = ({ visible, onClose, editData, addOREdit }) => {
                       </div>
                     ))}
                 </div>
-              </CCol>
-              <CCol xs={12} className="mt-3">
+              </CCol> */}
+              {/* <CCol xs={12} className="mt-3">
                 <CFormCheck
                   id="isActiveCheck"
                   label="Is Online"
                   checked={isActive}
                   onChange={handleIsActiveChange}
                 />
-              </CCol>
+              </CCol> */}
             </CRow>
           </CCardBody>
         </CCard>

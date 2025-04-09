@@ -22,11 +22,17 @@ const Items = () => {
   const [refresh, setRefresh] = useState(false)
   const [addOREdit, setAddOREdit] = useState(false)
   const [editData, setEditData] = useState(null)
+  const [dataLength, setdataLength] = useState(null)
 
   const getData = async () => {
     try {
       const result = await dispatch(fetchItemss())
-      setData(result)
+      console.log('[Debugging] : p result - ', dataLength, 'now - ', result.length);
+      if (dataLength !== result.length) {
+        console.log('changed length')
+        setData(result)
+        setdataLength(result.length)
+      }
     } catch (error) {
       console.error(error)
     }
@@ -35,7 +41,7 @@ const Items = () => {
   useEffect(() => {
     getData()
     const interval = setInterval(() => {
-      // console.log('Function called at interval')
+      console.log('Function called at interval')
       getData()
     }, 2000)
 

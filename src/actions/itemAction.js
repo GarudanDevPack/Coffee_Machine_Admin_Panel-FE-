@@ -13,7 +13,7 @@ import {
   FETCH_ITEM_BY_CLIENT,
   FETCH_ITEM_BY_ID,
   UPDATE_ITEM_BY_ID,
-  UPDATE_ITEM_TYPE_BY_ID,
+  // UPDATE_ITEM_TYPE_BY_ID,
 } from './types'
 
 export const fetchItemss = () => async (dispatch) => {
