@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { CCard, CButton, CCardHeader, CCardBody, CFormInput, CFormSelect } from '@coreui/react'
 import { cilPlus, cilFilter } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import { AddBrewStockModal } from '../../modal/AddComponentModel'
 import BrewStocksDataTableMui from '../../../components/tblcomponents/BrewStockDataTableWithFilter'
+import AddBrewStockModal from '../../modal/BrewStockModal'
 
 /**
  * author Anushka Isuru Lakmal
