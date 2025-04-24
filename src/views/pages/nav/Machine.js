@@ -4,7 +4,7 @@ import { cilPlus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import MachineDataTableMui from '../../../components/tblcomponents/MachineDataTableWithFilter'
 import { useDispatch } from 'react-redux'
-import { deleteMachine, fetchMachines } from '../../../actions/machineActions'
+import { deleteMachine, fetchMachines, updateMachineById } from '../../../actions/machineActions'
 import Swal from 'sweetalert2'
 import QRPreviewModal from '../../modal/QRModal'
 import AddMachineModal from '../../modal/MachineModal'
@@ -53,7 +53,6 @@ const Machines = () => {
     try {
       const result = await dispatch(fetchMachines())
       setData(result)
-      
     } catch (error) {
       console.error(error)
     }
@@ -91,6 +90,42 @@ const Machines = () => {
         }
       }
     })
+  }
+
+  const hanldeConfigMode = async (id) => {
+    let data = {
+      config_mode: true,
+    }
+    handleUpdateData(id, data)
+  }
+  const hanldeSleepMode = async (id, sleep) => {
+    if (sleep === true) {
+      sleep = false
+    } else {
+      sleep = true
+    }
+    let data = {
+      sleep_mode: sleep,
+    }
+    handleUpdateData(id, data)
+  }
+  const hanldeFlushMode = async (id) => {
+    let data = {
+      flush_mode: true,
+    }
+    handleUpdateData(id, data)
+  }
+
+  const handleUpdateData = async (id, data) => {
+    try {
+      // console.log(data)
+      await dispatch(updateMachineById(id, data))
+      Swal.fire('Updated!', 'The machine has been Action successfully.', 'success')
+      setRefresh((prev) => !prev)
+    } catch (error) {
+      console.error('Failed to delete machine:', error)
+      Swal.fire('Error!', 'Failed to on config mode in this machine. Please try again.', 'error')
+    }
   }
 
   return (
@@ -133,6 +168,9 @@ const Machines = () => {
             onDelete={handleDelete}
             onQRClick={handleOpenQRModal}
             onEditClick={handleOpenEditMachineModal}
+            onConfigModeClick={hanldeConfigMode}
+            onFlushModeClick={hanldeFlushMode}
+            onSleepModeClick={hanldeSleepMode}
           />
         </CCardBody>
       </CCard>

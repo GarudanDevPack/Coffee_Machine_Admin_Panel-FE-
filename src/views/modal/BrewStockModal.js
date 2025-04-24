@@ -127,7 +127,14 @@ const AddBrewStockModal = ({ visible, onClose }) => {
                           className="mb-0"
                           value={property.values}
                           onChange={(e) => handlePropertyValuesChange(index, e.target.value)}
-                          placeholder="Qty"
+                          placeholder="weight in gram"
+                        />
+                        <CFormInput
+                          type="text"
+                          className="mb-0"
+                          value={property.values}
+                          onChange={(e) => handlePropertyValuesChange(index, e.target.value)}
+                          placeholder="cup count"
                         />
                         <CButton color="danger" type="button" onClick={() => removeProperty(index)}>
                           <CIcon className="ml-2" icon={cilTrash} size="sm" />
@@ -136,9 +143,9 @@ const AddBrewStockModal = ({ visible, onClose }) => {
                     ))}
                 </div>
               </CCol>
-              <CCol xs={12} className="mt-3">
+              {/* <CCol xs={12} className="mt-3">
                 <CFormCheck id="isActiveCheck" label="Is Active" />
-              </CCol>
+              </CCol> */}
             </CRow>
           </CCardBody>
         </CCard>

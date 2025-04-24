@@ -1,7 +1,16 @@
 import React, { useMemo } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
-import { CBadge, CButton } from '@coreui/react' // Import CoreUI buttons if needed
-import { cilPenAlt, cilTrash, cilQrCode, cilColorFill, cilAudio } from '@coreui/icons'
+import { CBadge, CButton, CTooltip } from '@coreui/react' // Import CoreUI buttons if needed
+import {
+  cilPenAlt,
+  cilTrash,
+  cilQrCode,
+  cilColorFill,
+  cilAudio,
+  cilRss,
+  cilToggleOff,
+  cilToggleOn,
+} from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
 /**
@@ -10,7 +19,15 @@ import CIcon from '@coreui/icons-react'
  * copyright 2025
  */
 
-export const MachineDataTableMui = ({ tableData, onDelete, onQRClick, onEditClick }) => {
+export const MachineDataTableMui = ({
+  tableData,
+  onDelete,
+  onQRClick,
+  onEditClick,
+  onConfigModeClick,
+  onFlushModeClick,
+  onSleepModeClick,
+}) => {
   const columns = useMemo(
     () => [
       // {
@@ -52,11 +69,14 @@ export const MachineDataTableMui = ({ tableData, onDelete, onQRClick, onEditClic
         accessorKey: 'error',
         header: 'Description',
         size: 150,
-        Cell: ({ cell }) => (
-          <span style={{ color: cell.getValue() === 'STATE_READY' ? 'green' : 'red' }}>
-            {cell.getValue()}
-          </span>
-        ),
+        Cell: ({ cell }) => {
+          const value = cell.getValue()
+          return (
+            <span style={{ color: value === 'READY_STATE' ? 'green' : 'red' }}>
+              {value.toUpperCase()}
+            </span>
+          )
+        },
       },
       // {
       //   accessorKey: 'updatedAt',
@@ -85,26 +105,49 @@ export const MachineDataTableMui = ({ tableData, onDelete, onQRClick, onEditClic
         id: 'machine_actions', // Custom column for actions
         header: 'Machine Action',
         size: 100,
-        Cell: ({ row }) => (
-          <div>
-            <CButton
-              color="warning"
-              size="sm"
-              className="me-1"
-              //onClick={() => onEditClick(row.original)}
-            >
-              <CIcon className="ml-2" icon={cilColorFill} size="sm" />
-            </CButton>
-            <CButton
-              color="warning"
-              size="sm"
-              className="me-1"
-              //onClick={() => onEditClick(row.original)}
-            >
-              <CIcon className="ml-2" icon={cilAudio} size="sm" />
-            </CButton>
-          </div>
-        ),
+        Cell: ({ row }) => {
+          const isOffline =
+            row.original.status !== 'online' && row.original.error !== 'Sleep_Mode_ON'
+          const isColorButton = row.original.error !== 'Sleep_Mode_ON'
+          // console.log(isOffline)
+          return (
+            <div>
+              <CTooltip content="Config Mode (click to on ConfigMode this machine)" placement="top">
+                <CButton
+                  color="warning"
+                  size="sm"
+                  className="me-1"
+                  disabled={isOffline}
+                  onClick={() => onConfigModeClick(row.original.id)}
+                >
+                  <CIcon className="ml-2" icon={cilRss} size="sm" />
+                </CButton>
+              </CTooltip>
+              <CTooltip content="Flush Mode (click to flush this machine)" placement="top">
+                <CButton
+                  color="warning"
+                  size="sm"
+                  className="me-1"
+                  disabled={isOffline}
+                  onClick={() => onFlushModeClick(row.original.id)}
+                >
+                  <CIcon className="ml-2" icon={cilColorFill} size="sm" />
+                </CButton>
+              </CTooltip>
+              <CTooltip content="Sleep Mode (click to on SleepMode this machine)" placement="top">
+                <CButton
+                  color={isColorButton ? 'danger' : 'warning'}
+                  size="sm"
+                  className="me-1"
+                  disabled={isOffline}
+                  onClick={() => onSleepModeClick(row.original.id, row.original.sleep_mode)}
+                >
+                  <CIcon className="ml-2" icon={cilToggleOff} size="sm" />
+                </CButton>
+              </CTooltip>
+            </div>
+          )
+        },
       },
       {
         id: 'actions', // Custom column for actions
@@ -112,28 +155,34 @@ export const MachineDataTableMui = ({ tableData, onDelete, onQRClick, onEditClic
         size: 150,
         Cell: ({ row }) => (
           <div>
-            <CButton
-              color="info"
-              size="sm"
-              className="me-1"
-              onClick={() =>
-                onQRClick(row.original.id, row.original.client_id.id, row.original.org_id.id)
-              }
-            >
-              <CIcon className="ml-2" icon={cilQrCode} size="sm" />
-            </CButton>
-            <CButton
-              color="warning"
-              size="sm"
-              className="me-1"
-              onClick={() => onEditClick(row.original)}
-            >
-              <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
-            </CButton>
+            <CTooltip content="Show QR" placement="top">
+              <CButton
+                color="info"
+                size="sm"
+                className="me-1"
+                onClick={() =>
+                  onQRClick(row.original.id, row.original.client_id.id, row.original.org_id.id)
+                }
+              >
+                <CIcon className="ml-2" icon={cilQrCode} size="sm" />
+              </CButton>
+            </CTooltip>
+            <CTooltip content="Edit" placement="top">
+              <CButton
+                color="warning"
+                size="sm"
+                className="me-1"
+                onClick={() => onEditClick(row.original)}
+              >
+                <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
+              </CButton>
+            </CTooltip>
 
-            <CButton color="danger" size="sm" onClick={() => onDelete(row.original.id)}>
-              <CIcon className="ml-2" icon={cilTrash} size="sm" />
-            </CButton>
+            <CTooltip content="Delete" placement="top">
+              <CButton color="danger" size="sm" onClick={() => onDelete(row.original.id)}>
+                <CIcon className="ml-2" icon={cilTrash} size="sm" />
+              </CButton>
+            </CTooltip>
             {/* <CButton color="danger" size="sm">
               <CIcon className="ml-2" icon={cilTrash} size="sm" />
             </CButton> */}
