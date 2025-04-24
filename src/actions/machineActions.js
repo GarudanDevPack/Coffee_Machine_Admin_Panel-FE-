@@ -10,6 +10,9 @@ import {
   ADD_MACHINE,
   DELETE_MACHINE,
   FETCH_ALL_MACHINES,
+  FETCH_ALL_MACHINES_BY_CLIENT,
+  FETCH_ALL_MACHINES_STOCKS,
+  FETCH_ALL_MACHINES_STOCKS_BY_CLIENT,
   FETCH_MACHINE_BY_ID,
   UPDATE_MACHINE_BY_ID,
   UPDATE_MACHINE_STATUS,
@@ -19,6 +22,42 @@ export const fetchMachines = () => async (dispatch) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/getallmachinelogs`)
     dispatch({ type: FETCH_ALL_MACHINES, payload: response.data })
+    return response.data
+  } catch (error) {
+    console.error('Error adding machine:', error)
+    return null
+  }
+}
+
+export const fetchMachinesById = (client, org) => async (dispatch) => {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/getallmachinebyclient?client_id=${client}&org_id=${org}`,
+    )
+    dispatch({ type: FETCH_ALL_MACHINES_BY_CLIENT, payload: response.data })
+    return response.data
+  } catch (error) {
+    console.error('Error adding machine:', error)
+    return null
+  }
+}
+
+export const fetchMachineStocks = () => async (dispatch) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/getallmachinestocks`)
+    dispatch({ type: FETCH_ALL_MACHINES_STOCKS, payload: response.data })
+    return response.data
+  } catch (error) {
+    console.error('Error adding machine:', error)
+    return null
+  }
+}
+export const fetchMachineStocksByClient = (client, org) => async (dispatch) => {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/getallmachinestocks?client_id=${client}&org_id=${org}`,
+    )
+    dispatch({ type: FETCH_ALL_MACHINES_STOCKS_BY_CLIENT, payload: response.data })
     return response.data
   } catch (error) {
     console.error('Error adding machine:', error)

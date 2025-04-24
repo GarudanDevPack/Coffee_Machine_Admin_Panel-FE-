@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
-import { CButton } from '@coreui/react' // Import CoreUI buttons if needed
-import { cilPenAlt, cilTrash, cilQrCode } from '@coreui/icons'
+import { CBadge, CButton, CTooltip } from '@coreui/react' // Import CoreUI buttons if needed
+import { cilPenAlt, cilTrash, cilQrCode, cilLowVision } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
 /**
@@ -57,62 +57,81 @@ const data = [
   // Add more data as needed
 ]
 
-export const BrewStocksDataTableMui = () => {
+export const BrewStocksDataTableMui = ({ tableData }) => {
   // Columns should be memoized or stable
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'id',
-        header: '#',
+        accessorKey: 'name', // Access nested data with dot notation
+        header: 'Machine Name',
+        size: 150,
+      },
+      {
+        accessorKey: 'client_id.name',
+        header: 'Client Name',
+        size: 150,
+      },
+      {
+        accessorKey: 'org_id.name',
+        header: 'Org Name',
+        size: 150,
+      },
+      // {
+      //   accessorKey: 'inventory.length',
+      //   header: 'Item Count',
+      //   size: 200,
+      // },
+      {
+        accessorKey: 'inventory.length',
+        header: 'Item Count',
         size: 50,
+        Cell: ({ cell }) => (
+          <div className="d-flex justify-content-left">
+            <CBadge color="info">{cell.getValue()}</CBadge>
+          </div>
+        ),
       },
-      {
-        accessorKey: 'machineId', // Access nested data with dot notation
-        header: 'Machine ID',
-        size: 150,
-      },
-      {
-        accessorKey: 'outletName',
-        header: 'Outlet Name',
-        size: 150,
-      },
-      {
-        accessorKey: 'teaStock',
-        header: 'Tea Stock',
-        size: 150,
-      },
-      {
-        accessorKey: 'milkStock',
-        header: 'Milk Stock',
-        size: 200,
-      },
-      {
-        accessorKey: 'coffeeStock',
-        header: 'Coffee Stock',
-        size: 100,
-      },
-      {
-        accessorKey: 'foodStock',
-        header: 'Food Stock',
-        size: 100,
-      },
-      {
-        accessorKey: 'updatedDate',
-        header: 'Updated Date',
-        size: 150,
-      },
+      // {
+      //   accessorKey: 'coffeeStock',
+      //   header: 'Coffee Stock',
+      //   size: 100,
+      // },
+      // {
+      //   accessorKey: 'foodStock',
+      //   header: 'Food Stock',
+      //   size: 100,
+      // },
+
       {
         id: 'actions', // Custom column for actions
         header: 'Action',
         size: 200,
         Cell: ({ row }) => (
           <div>
-            <CButton color="warning" size="sm" className="me-1">
-              <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
-            </CButton>
-            <CButton color="danger" size="sm">
-              <CIcon className="ml-2" icon={cilTrash} size="sm" />
-            </CButton>
+            <CTooltip
+              content="View Stock"
+              placement="top"
+            >
+              <CButton color="success" size="sm" className="me-1">
+                <CIcon icon={cilLowVision} size="sm" />
+              </CButton>
+            </CTooltip>
+            <CTooltip
+              content="Edit"
+              placement="top"
+            >
+              <CButton color="warning" size="sm" className="me-1">
+                <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
+              </CButton>
+            </CTooltip>
+            {/* <CTooltip
+              content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
+              placement="top"
+            >
+              <CButton color="danger" size="sm">
+                <CIcon className="ml-2" icon={cilTrash} size="sm" />
+              </CButton>
+            </CTooltip> */}
           </div>
         ),
       },
@@ -122,7 +141,7 @@ export const BrewStocksDataTableMui = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data, // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    data: tableData.data || [], // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
   })
 
   return <MaterialReactTable table={table} />
