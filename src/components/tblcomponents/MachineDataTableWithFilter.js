@@ -136,7 +136,7 @@ export const MachineDataTableMui = ({
               </CTooltip>
               <CTooltip content="Sleep Mode (click to on SleepMode this machine)" placement="top">
                 <CButton
-                  color={isColorButton ? 'danger' : 'warning'}
+                  color={isColorButton ? 'success' : 'danger'}
                   size="sm"
                   className="me-1"
                   disabled={isOffline}

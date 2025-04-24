@@ -92,40 +92,64 @@ const Machines = () => {
     })
   }
 
-  const hanldeConfigMode = async (id) => {
+  const handleConfigMode = async (id) => {
     let data = {
       config_mode: true,
     }
-    handleUpdateData(id, data)
+    handleUpdateData(id, data, 'Config')
   }
-  const hanldeSleepMode = async (id, sleep) => {
-    if (sleep === true) {
-      sleep = false
-    } else {
-      sleep = true
-    }
-    let data = {
+  // const hanldeSleepMode = async (id, sleep) => {
+  //   if (sleep === true) {
+  //     sleep = false
+  //   } else {
+  //     sleep = true
+  //   }
+  //   console.log(sleep)
+  //   let data = {
+  //     sleep_mode: sleep,
+  //   }
+  //   handleUpdateData(id, data, 'Sleep')
+  // }
+  const handleSleepMode = async (id, currentSleep) => {
+    const sleep = !currentSleep // Toggle the boolean
+    console.log(sleep)
+
+    const data = {
       sleep_mode: sleep,
     }
-    handleUpdateData(id, data)
+
+    handleUpdateData(id, data, 'Sleep')
   }
-  const hanldeFlushMode = async (id) => {
+
+  const handleFlushMode = async (id) => {
     let data = {
       flush_mode: true,
     }
-    handleUpdateData(id, data)
+
+    handleUpdateData(id, data, 'Flush')
   }
 
-  const handleUpdateData = async (id, data) => {
-    try {
-      // console.log(data)
-      await dispatch(updateMachineById(id, data))
-      Swal.fire('Updated!', 'The machine has been Action successfully.', 'success')
-      setRefresh((prev) => !prev)
-    } catch (error) {
-      console.error('Failed to delete machine:', error)
-      Swal.fire('Error!', 'Failed to on config mode in this machine. Please try again.', 'error')
-    }
+  const handleUpdateData = async (id, data, text) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: `Yes, ${text} it`,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(updateMachineById(id, data))
+          Swal.fire('Updated!', `The ${id} has been Action successfully.`, 'success')
+          setRefresh((prev) => !prev)
+        } catch (error) {
+          console.error('Failed to delete machine:', error)
+          Swal.fire('Error!', `Failed to action in ${id} machine. Please try again.`, 'error')
+        }
+      }
+    })
   }
 
   return (
@@ -168,9 +192,9 @@ const Machines = () => {
             onDelete={handleDelete}
             onQRClick={handleOpenQRModal}
             onEditClick={handleOpenEditMachineModal}
-            onConfigModeClick={hanldeConfigMode}
-            onFlushModeClick={hanldeFlushMode}
-            onSleepModeClick={hanldeSleepMode}
+            onConfigModeClick={handleConfigMode}
+            onFlushModeClick={handleFlushMode}
+            onSleepModeClick={handleSleepMode}
           />
         </CCardBody>
       </CCard>
