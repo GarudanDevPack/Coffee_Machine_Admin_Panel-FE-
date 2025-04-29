@@ -71,13 +71,25 @@ export const MachineDataTableMui = ({
         size: 150,
         Cell: ({ cell }) => {
           const value = cell.getValue()
-          return (
-            <span style={{ color: value === 'READY_STATE' ? 'green' : 'red' }}>
-              {value.toUpperCase()}
-            </span>
-          )
+          const displayValue = value ? value.toUpperCase() : ''
+          const color = value === 'READY_STATE' ? 'green' : 'red'
+
+          return <span style={{ color }}>{displayValue}</span>
         },
       },
+      // {
+      //   accessorKey: 'error',
+      //   header: 'Description',
+      //   size: 150,
+      //   Cell: ({ cell }) => {
+      //     const value = cell.getValue()
+      //     return (
+      //       <span style={{ color: value === 'READY_STATE' ? 'green' : 'red' }}>
+      //         {value.toUpperCase()}
+      //       </span>
+      //     )
+      //   },
+      // },
       // {
       //   accessorKey: 'updatedAt',
       //   header: 'Updated Date',

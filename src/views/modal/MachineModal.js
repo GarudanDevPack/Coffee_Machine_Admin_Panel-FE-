@@ -42,34 +42,34 @@ const AddMachineModal = ({ visible, onClose, editData, addOREdit }) => {
   const [isActive, setIsActive] = useState(false)
 
 
-  const addProperty = () => {
-    if (properties.length >= itemData.length) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Limit Reached',
-        text: 'You can only add up to 3 inventory items.',
-      })
-      return
-    }
+  // const addProperty = () => {
+  //   if (properties.length >= itemData.length) {
+  //     Swal.fire({
+  //       icon: 'warning',
+  //       title: 'Limit Reached',
+  //       text: 'You can only add up to 3 inventory items.',
+  //     })
+  //     return
+  //   }
 
-    setProperties([...properties, { item_id: '', stock: '', qty: '' }])
-  }
+  //   setProperties([...properties, { item_id: '', stock: '', qty: '' }])
+  // }
 
-  const removeProperty = (index) => {
-    setProperties(properties.filter((_, i) => i !== index))
-  }
+  // const removeProperty = (index) => {
+  //   setProperties(properties.filter((_, i) => i !== index))
+  // }
 
 
-  const handlePropertyChange = (index, field, value) => {
-    // Validate numeric input for 'stock' and 'qty'
-    if (field === 'stock' || field === 'qty') {
-      value = value.replace(/[^0-9.]/g, '') // Allow only numeric input and decimals
-    }
+  // const handlePropertyChange = (index, field, value) => {
+  //   // Validate numeric input for 'stock' and 'qty'
+  //   if (field === 'stock' || field === 'qty') {
+  //     value = value.replace(/[^0-9.]/g, '') // Allow only numeric input and decimals
+  //   }
 
-    const updatedProperties = [...properties]
-    updatedProperties[index] = { ...updatedProperties[index], [field]: value }
-    setProperties(updatedProperties)
-  }
+  //   const updatedProperties = [...properties]
+  //   updatedProperties[index] = { ...updatedProperties[index], [field]: value }
+  //   setProperties(updatedProperties)
+  // }
 
   useEffect(() => {
     // console.log(addOREdit)
@@ -82,13 +82,13 @@ const AddMachineModal = ({ visible, onClose, editData, addOREdit }) => {
       setMachineName(editData.name || '')
       setSelectedClient(editData.client_id?.id?.toString() || '')
       setIsActive(editData.status === 'online')
-      setProperties(
-        editData.inventory?.map((item) => ({
-          item_id: item.item_id,
-          stock: item.stock.toString(),
-          qty: item.qty.toString(),
-        })) || [],
-      )
+      // setProperties(
+      //   editData.inventory?.map((item) => ({
+      //     item_id: item.item_id,
+      //     stock: item.stock.toString(),
+      //     qty: item.qty.toString(),
+      //   })) || [],
+      // )
 
       // Fetch organizations for the client in editData
       const fetchOrganizationsForClient = async () => {
@@ -160,7 +160,7 @@ const AddMachineModal = ({ visible, onClose, editData, addOREdit }) => {
   }
 
   const resetForm = () => {
-    setProperties([])
+    // setProperties([])
     setMachineName('') // Clear machine name
     setSelectedClient('')
     setSelectedOrg('')
@@ -182,7 +182,7 @@ const AddMachineModal = ({ visible, onClose, editData, addOREdit }) => {
           name: organizations.find((org) => org.id.toString() === selectedOrg)?.name || '',
         },
         name: machineName,
-        item_id: properties.map((prop) => prop.item_id),
+        //item_id: properties.map((prop) => prop.item_id),
         status: isActive ? 'online' : 'offline',
         last_maintenance: new Date(),
         expire_at: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Set expire_at to 1 year from now
@@ -204,7 +204,7 @@ const AddMachineModal = ({ visible, onClose, editData, addOREdit }) => {
           name: organizations.find((org) => org.id.toString() === selectedOrg)?.name || '',
         },
         name: machineName,
-        item_id: properties.map((prop) => prop.item_id),
+        //item_id: properties.map((prop) => prop.item_id),
         status: isActive ? 'online' : 'offline',
         last_maintenance: new Date(),
         expire_at: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // Set expire_at to 1 year from now
@@ -220,6 +220,7 @@ const AddMachineModal = ({ visible, onClose, editData, addOREdit }) => {
     try {
       let response = {}
       if (!editData) {
+        console.log(data)
         response = await dispatch(addMachine(data))
       } else {
         response = await dispatch(updateMachineById(data))

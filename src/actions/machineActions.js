@@ -67,7 +67,7 @@ export const fetchMachineStocksByClient = (client, org) => async (dispatch) => {
 
 export const fetchMachineById = (id) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getmachinelog/${id}`)
+    const response = await axios.get(`${API_BASE_URL}/getmachinelog?id=${id}`)
     dispatch({ type: FETCH_MACHINE_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
@@ -89,9 +89,12 @@ export const addMachine = (machines) => async (dispatch) => {
 
 export const updateMachineById = (id, machine) => async (dispatch) => {
   try {
+
+    console.log(id, machine)
     const response = await axios.put(`${API_BASE_URL}/updatemachinelog?id=${id}`, machine)
     dispatch({ type: UPDATE_MACHINE_BY_ID, payload: response.data })
-    return response.data
+    console.log(response.data)
+    //return response.data
   } catch (error) {
     console.error('Error adding machine:', error)
     return null

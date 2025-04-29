@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { CBadge, CButton, CTooltip } from '@coreui/react' // Import CoreUI buttons if needed
-import { cilPenAlt, cilTrash, cilQrCode, cilLowVision } from '@coreui/icons'
+import { cilPenAlt, cilLowVision } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
+import ViewStockDataModal from '../../views/modal/ViewStockDataModal'
 
 /**
  * author Anushka Isuru Lakmal
@@ -10,54 +11,9 @@ import CIcon from '@coreui/icons-react'
  * copyright 2025
  */
 
-const data = [
-  {
-    id: 1,
-    machineId: 'MC-00001',
-    outletName: 'Outlet 01',
-    teaStock: '12',
-    milkStock: '10',
-    coffeeStock: '05',
-    foodStock: '15',
-    updatedDate: '01-01-2025',
-  },
-  {
-    id: 2,
-    machineId: 'MC-00002',
-    outletName: 'Outlet 01',
-    teaStock: '18',
-    milkStock: '11',
-    coffeeStock: '02',
-    foodStock: '20',
-    updatedDate: '01-01-2025',
-  },
-  {
-    id: 3,
-    machineId: 'MC-00001',
-    outletName: 'Outlet 02',
-    teaStock: '12',
-    milkStock: '10',
-    coffeeStock: '05',
-    foodStock: '15',
-    updatedDate: '01-01-2025',
-  },
-
-  //   {
-  //     id: 2,
-  //     name: {
-  //       firstName: 'Jane',
-  //       lastName: 'Doe',
-  //     },
-  //     mobile: '+94112345678',
-  //     email: 'jane.doe@example.com',
-  //     gender: 'Female',
-  //     dob: '10-10-1990',
-  //     createdDate: '15-01-2025',
-  //   },
-  // Add more data as needed
-]
-
-export const BrewStocksDataTableMui = ({ tableData }) => {
+export const BrewStocksDataTableMui = ({ tableData, onEditClick }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [selectedRow, setSelectedRow] = useState(null) // Store selected row data
   // Columns should be memoized or stable
   const columns = useMemo(
     () => [
@@ -76,11 +32,6 @@ export const BrewStocksDataTableMui = ({ tableData }) => {
         header: 'Org Name',
         size: 150,
       },
-      // {
-      //   accessorKey: 'inventory.length',
-      //   header: 'Item Count',
-      //   size: 200,
-      // },
       {
         accessorKey: 'inventory.length',
         header: 'Item Count',
@@ -108,19 +59,26 @@ export const BrewStocksDataTableMui = ({ tableData }) => {
         size: 200,
         Cell: ({ row }) => (
           <div>
-            <CTooltip
-              content="View Stock"
-              placement="top"
-            >
-              <CButton color="success" size="sm" className="me-1">
+            <CTooltip content="View Stock" placement="top">
+              <CButton
+                color="success"
+                size="sm"
+                className="me-1"
+                onClick={() => {
+                  setSelectedRow(row.original) // Set the selected row data
+                  setIsModalVisible(true) // Show modal
+                }}
+              >
                 <CIcon icon={cilLowVision} size="sm" />
               </CButton>
             </CTooltip>
-            <CTooltip
-              content="Edit"
-              placement="top"
-            >
-              <CButton color="warning" size="sm" className="me-1">
+            <CTooltip content="Edit" placement="top">
+              <CButton
+                color="warning"
+                size="sm"
+                className="me-1"
+                onClick={() => onEditClick(row.original)}
+              >
                 <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
               </CButton>
             </CTooltip>
@@ -144,7 +102,18 @@ export const BrewStocksDataTableMui = ({ tableData }) => {
     data: tableData.data || [], // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
   })
 
-  return <MaterialReactTable table={table} />
+  return (
+    <>
+      <MaterialReactTable table={table} />
+      {/* Pass selectedRow data to the modal */}
+      <ViewStockDataModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        rowData={selectedRow}
+      />
+    </>
+  )
+  // return <MaterialReactTable table={table} />
 }
 
 export default BrewStocksDataTableMui
