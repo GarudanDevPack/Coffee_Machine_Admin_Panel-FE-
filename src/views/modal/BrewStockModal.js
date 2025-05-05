@@ -99,8 +99,10 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
       setProperties(
         editData.inventory?.map((item) => ({
           item_id: item.item_id,
+          nozzle: item.nozzle,
           stock: item.stock.toString(),
           qty: item.qty.toString(),
+          cupcount: item.cupcount.toString(),
         })) || [],
       )
     } else {
@@ -132,8 +134,8 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
         cupcount: Number(prop.qty),
       })),
     }
-    //console.log('in edit mode : ', data)
-    //}
+    console.log('in edit mode : ', data)
+    // }
 
     try {
       console.log('[Debugging] : save content - ', data)
