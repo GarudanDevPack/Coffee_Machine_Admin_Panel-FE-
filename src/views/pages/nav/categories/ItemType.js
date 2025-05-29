@@ -4,8 +4,9 @@ import { CCard, CButton, CCardHeader, CCardBody } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
 import ItemDataTableMui from '../../../../components/tblcomponents/ItemTableWithFilter'
-import { AddItemTypeModal } from '../../../modal/AddComponentModel'
+// import { AddItemTypeModal } from '../../../modal/AddComponentModel'
 import ItemTypeDataTableMui from '../../../../components/tblcomponents/categories/ItemTypeTableWithFilter'
+import AddItemTypeModal from '../../../modal/ItemTypeModal'
 
 
 /**

@@ -1,83 +1,159 @@
-import React, { useState } from 'react'
-import {
-  CRow,
-  CCol,
-  CCard,
-  CFormInput,
-  CButton,
-  CFormCheck,
-  CCardHeader,
-  CCardBody,
-  CFormLabel,
-} from '@coreui/react'
-import { cilPlus, cilTrash } from '@coreui/icons'
-import { TableViewMachine } from '../../../components/tblcomponents/CDataTable'
+import React, { useEffect, useState } from 'react'
+import { CCard, CButton, CCardHeader, CCardBody } from '@coreui/react'
+import { cilPlus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import { AddMachineModal } from '../../modal/AddComponentModel'
 import MachineDataTableMui from '../../../components/tblcomponents/MachineDataTableWithFilter'
+import { useDispatch } from 'react-redux'
+import { deleteMachine, fetchMachines, updateMachineById } from '../../../actions/machineActions'
+import Swal from 'sweetalert2'
+import QRPreviewModal from '../../modal/QRModal'
+import AddMachineModal from '../../modal/MachineModal'
 
 const Machines = () => {
+  const dispatch = useDispatch()
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [data, setData] = useState([])
+  const [refresh, setRefresh] = useState(false)
+  const [addOREdit, setAddOREdit] = useState(false)
+  const [isQRModalVisible, setIsQRModalVisible] = useState(false)
+  const [qrCodeData, setQrCodeData] = useState({
+    id: null,
+    clientId: null,
+    orgId: null,
+  })
+  const [editData, setEditData] = useState(null)
+
+  const handleOpenEditMachineModal = (machine) => {
+    setEditData(machine)
+    setIsModalVisible(true)
+    setAddOREdit(false)
+  }
+
+  const handleCloseEditMachineModal = () => {
+    setEditData(null)
+    setIsModalVisible(false)
+  }
+
+  const handleOpenQRModal = (id, clientId, orgId) => {
+    setQrCodeData({ id, clientId, orgId })
+    setIsQRModalVisible(true)
+  }
+
+  const handleCloseQRModal = () => {
+    setIsQRModalVisible(false)
+    setQrCodeData({ id: null, clientId: null, orgId: null })
+  }
+
+  const handeAddMachineModal = () => {
+    setEditData(null)
+    setIsModalVisible(true)
+    setAddOREdit(true)
+  }
+  const getData = async () => {
+    try {
+      const result = await dispatch(fetchMachines())
+      setData(result)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    getData()
+    const interval = setInterval(() => {
+      // console.log('Function called at interval')
+      getData()
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [!isModalVisible, refresh])
+
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(deleteMachine(id))
+          Swal.fire('Deleted!', 'The machine has been deleted successfully.', 'success')
+
+          setRefresh((prev) => !prev)
+        } catch (error) {
+          console.error('Failed to delete machine:', error)
+          Swal.fire('Error!', 'Failed to delete the machine. Please try again.', 'error')
+        }
+      }
+    })
+  }
+
+  const handleConfigMode = async (id) => {
+    let data = {
+      config_mode: true,
+    }
+    handleUpdateData(id, data, 'Config')
+  }
+  // const hanldeSleepMode = async (id, sleep) => {
+  //   if (sleep === true) {
+  //     sleep = false
+  //   } else {
+  //     sleep = true
+  //   }
+  //   console.log(sleep)
+  //   let data = {
+  //     sleep_mode: sleep,
+  //   }
+  //   handleUpdateData(id, data, 'Sleep')
+  // }
+  const handleSleepMode = async (id, currentSleep) => {
+    const sleep = !currentSleep // Toggle the boolean
+    console.log(sleep)
+
+    const data = {
+      sleep_mode: sleep,
+    }
+
+    handleUpdateData(id, data, 'Sleep')
+  }
+
+  const handleFlushMode = async (id) => {
+    let data = {
+      flush_mode: true,
+    }
+
+    handleUpdateData(id, data, 'Flush')
+  }
+
+  const handleUpdateData = async (id, data, text) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: `Yes, ${text} it`,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(updateMachineById(id, data))
+          Swal.fire('Updated!', `The ${id} has been Action successfully.`, 'success')
+          setRefresh((prev) => !prev)
+        } catch (error) {
+          console.error('Failed to delete machine:', error)
+          Swal.fire('Error!', `Failed to action in ${id} machine. Please try again.`, 'error')
+        }
+      }
+    })
+  }
 
   return (
     <>
-      {/* <CCard className="mb-4">
-        <CCardHeader>Manage Machines</CCardHeader>
-        <CCardBody>
-          <CRow>
-            <CCol md={6}>
-              <CFormInput type="text" id="machineName" label="Machine Name" placeholder="Name" />
-            </CCol>
-            <CCol md={6}>
-              <CFormInput type="text" id="machineType" label="Machine Type" placeholder="Type" />
-            </CCol>
-            <CCol xs={12} md={12} className="mt-3">
-              <div className="mb-2">
-                <CRow>
-                  <CFormLabel className="mb-3">Properties</CFormLabel>
-                </CRow>
-                <CButton
-                  color="info"
-                  type="button"
-                  onClick={addProperty}
-                  className="btn-default text-sm mb-4"
-                >
-                  Add
-                  <CIcon className="ml-2" icon={cilPlus} size="sm" />
-                </CButton>
-                {properties.length > 0 &&
-                  properties.map((property, index) => (
-                    <div className="d-flex gap-2 mb-2" key={index}>
-                      <CFormInput
-                        type="text"
-                        className="mb-0"
-                        value={property.name}
-                        onChange={(e) => handlePropertyNameChange(index, e.target.value)}
-                        placeholder="Property name (e.g., color)"
-                      />
-                      <CFormInput
-                        type="text"
-                        className="mb-0"
-                        value={property.values}
-                        onChange={(e) => handlePropertyValuesChange(index, e.target.value)}
-                        placeholder="Values, comma-separated"
-                      />
-                      <CButton color="danger" type="button" onClick={() => removeProperty(index)}>
-                        <CIcon className="ml-2" icon={cilTrash} size="sm" />
-                      </CButton>
-                    </div>
-                  ))}
-              </div>
-            </CCol>
-            <CCol xs={12} className="mt-3">
-              <CFormCheck id="isActiveCheck" label="Is Active" />
-            </CCol>
-            <CCol xs={12} className="mt-3">
-              <CButton color="primary">Submit</CButton>
-            </CCol>
-          </CRow>
-        </CCardBody>
-      </CCard> */}
       <CCard className="mb-4">
         <CCardHeader>
           <div className="d-flex justify-content-between align-items-center">
@@ -87,44 +163,39 @@ const Machines = () => {
               <CButton
                 color="info"
                 type="button"
-                onClick={() => setIsModalVisible(true)}
+                onClick={() => handeAddMachineModal()}
                 className="btn-default text-sm"
               >
-                Add&nbsp;
+                Add Machine&nbsp;
                 <CIcon className="ml-2" icon={cilPlus} size="sm" />
               </CButton>
 
-              <AddMachineModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} />
-              {/* <CButton
-                color="info"
-                type="button"
-                onClick={() => console.log('popup add items!')}
-                className="btn-default text-sm"
-              >
-                Add  
-                <CIcon className="ml-2" icon={cilPlus} size="sm" />
-              </CButton> */}
+              <AddMachineModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                editData={editData}
+                addOREdit={addOREdit}
+              />
             </div>
           </div>
-          {/* <CRow> */}
-          {/* <div className="d-flex auto">
-            <div>Manage Machines</div>
-            <CButton
-              color="info"
-              type="button"
-              onClick={console.log('popup add items !')}
-              className="btn-default text-sm mb-4"
-            >
-              Add
-              <CIcon className="ml-2" icon={cilPlus} size="sm" />
-            </CButton>
-          </div> */}
-          {/* </CRow> */}
         </CCardHeader>
-
         <CCardBody className="mt-4">
-          <MachineDataTableMui />
-          {/* <TableViewMachine /> */}
+          {/* qr modal */}
+          <QRPreviewModal
+            visible={isQRModalVisible}
+            onClose={handleCloseQRModal}
+            qrCodeData={qrCodeData}
+          />
+          {/* dataTable */}
+          <MachineDataTableMui
+            tableData={data}
+            onDelete={handleDelete}
+            onQRClick={handleOpenQRModal}
+            onEditClick={handleOpenEditMachineModal}
+            onConfigModeClick={handleConfigMode}
+            onFlushModeClick={handleFlushMode}
+            onSleepModeClick={handleSleepMode}
+          />
         </CCardBody>
       </CCard>
     </>

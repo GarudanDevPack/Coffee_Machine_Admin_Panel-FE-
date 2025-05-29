@@ -1,7 +1,16 @@
 import React, { useMemo } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
-import { CButton } from '@coreui/react' // Import CoreUI buttons if needed
-import { cilPenAlt, cilTrash, cilQrCode } from '@coreui/icons'
+import { CBadge, CButton, CTooltip } from '@coreui/react' // Import CoreUI buttons if needed
+import {
+  cilPenAlt,
+  cilTrash,
+  cilQrCode,
+  cilColorFill,
+  cilAudio,
+  cilRss,
+  cilToggleOff,
+  cilToggleOn,
+} from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
 /**
@@ -10,104 +19,195 @@ import CIcon from '@coreui/icons-react'
  * copyright 2025
  */
 
-const data = [
-  {
-    id: 1,
-    machineId:'MC-00001',
-    outletName: 'Colombo',
-    loadingQty: '500',
-    features: 'Load Extras',
-    addedDate: '12-12-2000',
-    createdDate: '01-01-2025',
-  },
-  {
-    id: 2,
-    machineId:'MC-00002',
-    outletName: 'Colombo',
-    loadingQty: '200',
-    features: 'Load Extras',
-    addedDate: '12-12-2000',
-    createdDate: '01-01-2025',
-  },
-//   {
-//     id: 2,
-//     name: {
-//       firstName: 'Jane',
-//       lastName: 'Doe',
-//     },
-//     mobile: '+94112345678',
-//     email: 'jane.doe@example.com',
-//     gender: 'Female',
-//     dob: '10-10-1990',
-//     createdDate: '15-01-2025',
-//   },
-  // Add more data as needed
-]
-
-export const MachineDataTableMui = () => {
-  // Columns should be memoized or stable
+export const MachineDataTableMui = ({
+  tableData,
+  onDelete,
+  onQRClick,
+  onEditClick,
+  onConfigModeClick,
+  onFlushModeClick,
+  onSleepModeClick,
+}) => {
   const columns = useMemo(
     () => [
+      // {
+      //   accessorKey: '',
+      //   header: '#',
+      //   size: 50,
+      // },
       {
-        accessorKey: 'id',
-        header: '#',
-        size: 50,
-      },
-      {
-        accessorKey: 'machineId', // Access nested data with dot notation
-        header: 'Machine ID',
+        accessorKey: 'name',
+        header: 'Name',
         size: 150,
       },
       {
-        accessorKey: 'outletName',
-        header: 'Outlet Name',
+        accessorKey: 'client_id.name',
+        header: 'Client Name',
         size: 150,
       },
       {
-        accessorKey: 'loadingQty',
+        accessorKey: 'org_id.name',
+        header: 'Org Name',
+        size: 150,
+      },
+      {
+        accessorKey: 'inventory.length',
         header: 'Loading QTY',
         size: 150,
       },
       {
-        accessorKey: 'features',
-        header: 'Features',
-        size: 200,
-      },
-      {
-        accessorKey: 'addedDate',
-        header: 'Added Date',
+        accessorKey: 'status',
+        header: 'Status',
         size: 100,
+        Cell: ({ cell }) => (
+          <CBadge color={cell.getValue() === 'online' ? 'success' : 'danger'}>
+            {cell.getValue()}
+          </CBadge>
+        ),
       },
       {
-        accessorKey: 'createdDate',
-        header: 'Created Date',
+        accessorKey: 'error',
+        header: 'Description',
         size: 150,
+        Cell: ({ cell }) => {
+          const value = cell.getValue()
+          const displayValue = value ? value.toUpperCase() : ''
+          const color = value === 'READY_STATE' ? 'green' : 'red'
+
+          return <span style={{ color }}>{displayValue}</span>
+        },
+      },
+      // {
+      //   accessorKey: 'error',
+      //   header: 'Description',
+      //   size: 150,
+      //   Cell: ({ cell }) => {
+      //     const value = cell.getValue()
+      //     return (
+      //       <span style={{ color: value === 'READY_STATE' ? 'green' : 'red' }}>
+      //         {value.toUpperCase()}
+      //       </span>
+      //     )
+      //   },
+      // },
+      // {
+      //   accessorKey: 'updatedAt',
+      //   header: 'Updated Date',
+      //   size: 150,
+      // },
+      {
+        accessorKey: 'updatedAt',
+        header: 'Updated Date',
+        size: 150,
+        Cell: ({ row }) => {
+          const date = new Date(row.original.updatedAt)
+          return date
+            .toLocaleString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true,
+            })
+            .replace(',', '') // Remove the comma
+        },
+      },
+      {
+        id: 'machine_actions', // Custom column for actions
+        header: 'Machine Action',
+        size: 100,
+        Cell: ({ row }) => {
+          const isOffline =
+            row.original.status !== 'online' && row.original.error !== 'Sleep_Mode_ON'
+          const isColorButton = row.original.error !== 'Sleep_Mode_ON'
+          // console.log(isOffline)
+          return (
+            <div>
+              <CTooltip content="Config Mode (click to on ConfigMode this machine)" placement="top">
+                <CButton
+                  color="warning"
+                  size="sm"
+                  className="me-1"
+                  disabled={isOffline}
+                  onClick={() => onConfigModeClick(row.original.id)}
+                >
+                  <CIcon className="ml-2" icon={cilRss} size="sm" />
+                </CButton>
+              </CTooltip>
+              <CTooltip content="Flush Mode (click to flush this machine)" placement="top">
+                <CButton
+                  color="warning"
+                  size="sm"
+                  className="me-1"
+                  disabled={isOffline}
+                  onClick={() => onFlushModeClick(row.original.id)}
+                >
+                  <CIcon className="ml-2" icon={cilColorFill} size="sm" />
+                </CButton>
+              </CTooltip>
+              <CTooltip content="Sleep Mode (click to on SleepMode this machine)" placement="top">
+                <CButton
+                  color={isColorButton ? 'success' : 'danger'}
+                  size="sm"
+                  className="me-1"
+                  disabled={isOffline}
+                  onClick={() => onSleepModeClick(row.original.id, row.original.sleep_mode)}
+                >
+                  <CIcon className="ml-2" icon={cilToggleOff} size="sm" />
+                </CButton>
+              </CTooltip>
+            </div>
+          )
+        },
       },
       {
         id: 'actions', // Custom column for actions
         header: 'Action',
-        size: 200,
+        size: 150,
         Cell: ({ row }) => (
           <div>
-            <CButton color="info" size="sm" className="me-1">
-              <CIcon className="ml-2" icon={cilQrCode} size="sm" />
-            </CButton>
-            <CButton color="warning" size="sm" className="me-1">
-              <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
-            </CButton>
-            <CButton color="danger" size="sm">
+            <CTooltip content="Show QR" placement="top">
+              <CButton
+                color="info"
+                size="sm"
+                className="me-1"
+                onClick={() =>
+                  onQRClick(row.original.id, row.original.client_id.id, row.original.org_id.id)
+                }
+              >
+                <CIcon className="ml-2" icon={cilQrCode} size="sm" />
+              </CButton>
+            </CTooltip>
+            <CTooltip content="Edit" placement="top">
+              <CButton
+                color="warning"
+                size="sm"
+                className="me-1"
+                onClick={() => onEditClick(row.original)}
+              >
+                <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
+              </CButton>
+            </CTooltip>
+
+            <CTooltip content="Delete" placement="top">
+              <CButton color="danger" size="sm" onClick={() => onDelete(row.original.id)}>
+                <CIcon className="ml-2" icon={cilTrash} size="sm" />
+              </CButton>
+            </CTooltip>
+            {/* <CButton color="danger" size="sm">
               <CIcon className="ml-2" icon={cilTrash} size="sm" />
-            </CButton>
+            </CButton> */}
           </div>
         ),
       },
     ],
-    [],
+    [onDelete],
   )
 
   const table = useMaterialReactTable({
     columns,
-    data, // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    data: tableData.data || [], // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
   })
 
   return <MaterialReactTable table={table} />

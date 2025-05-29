@@ -1,16 +1,13 @@
-import React, { useState } from 'react'
-import { CCard, CButton, CCardHeader, CCardBody, CFormInput, CFormSelect } from '@coreui/react'
-import { cilPlus, cilFilter } from '@coreui/icons'
-import {
-  TableViewCustomer,
-  TableViewCustomerWithFilter,
-  TableViewCustomerWithPagination,
-} from '../../../components/tblcomponents/CDataTable'
+import React, { useEffect, useState } from 'react'
+import { CCard, CButton, CCardHeader, CCardBody } from '@coreui/react'
+import { cilPlus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import { AddCustomerWalletModal, AddItemModal } from '../../modal/AddComponentModel'
-import { CustomerWalletDataTableMui } from '../../../components/tblcomponents/CustomerWalletsTableWithFilter'
+// import { AddCustomerWalletModal, AddItemModal } from '../../modal/AddComponentModel'
 import ItemDataTableMui from '../../../components/tblcomponents/ItemTableWithFilter'
-// import ItemDataTableMui from '../../../components/tblcomponents/ItemTableWithFilter'
+import AddItemModal from '../../modal/ItemModal'
+import { useDispatch } from 'react-redux'
+import { deleteItem, fetchItemss } from '../../../actions/itemAction'
+import Swal from 'sweetalert2'
 
 /**
  * author Anushka Isuru Lakmal
@@ -20,6 +17,36 @@ import ItemDataTableMui from '../../../components/tblcomponents/ItemTableWithFil
 
 const Items = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const dispatch = useDispatch()
+  const [data, setData] = useState([])
+  const [refresh, setRefresh] = useState(false)
+  const [addOREdit, setAddOREdit] = useState(false)
+  const [editData, setEditData] = useState(null)
+  const [dataLength, setdataLength] = useState(null)
+
+  const getData = async () => {
+    try {
+      const result = await dispatch(fetchItemss())
+      console.log('[Debugging] : p result - ', dataLength, 'now - ', result.length);
+      if (dataLength !== result.length) {
+        console.log('changed length')
+        setData(result)
+        setdataLength(result.length)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    getData()
+    const interval = setInterval(() => {
+      console.log('Function called at interval')
+      getData()
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [!isModalVisible, refresh])
 
   // Function to save the last time the tab was left
   function saveLastLeftTime() {
@@ -64,6 +91,38 @@ const Items = () => {
     }
   })
 
+  const handleOpenEditItemModal = (item) => {
+    //console.log(item)
+    setEditData(item)
+    setIsModalVisible(true)
+    setAddOREdit(false)
+  }
+
+  const handleDelete = async (id) => {
+    //console.log(id)
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await dispatch(deleteItem(id))
+          Swal.fire('Deleted!', 'The machine has been deleted successfully.', 'success')
+
+          setRefresh((prev) => !prev)
+        } catch (error) {
+          console.error('Failed to delete machine:', error)
+          Swal.fire('Error!', 'Failed to delete the machine. Please try again.', 'error')
+        }
+      }
+    })
+  }
+
   return (
     <>
       <CCard className="mb-4">
@@ -83,14 +142,22 @@ const Items = () => {
                 Add New Item&nbsp;
                 <CIcon className="ml-2" icon={cilPlus} size="sm" />
               </CButton>
-              <AddItemModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} />
+              <AddItemModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                editData={editData}
+                addOREdit={addOREdit}
+              />
             </div>
           </div>
         </CCardHeader>
 
         <CCardBody className="mt-4">
-          {/* <CustomerWalletDataTableMui /> */}
-          <ItemDataTableMui />
+          <ItemDataTableMui
+            tableData={data}
+            onDelete={handleDelete}
+            onEditClick={handleOpenEditItemModal}
+          />
         </CCardBody>
       </CCard>
     </>

@@ -5,46 +5,13 @@ import { cilPenAlt, cilTrash, cilQrCode } from '@coreui/icons'
 import { CBadge } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 
-const data = [
-  {
-    id: 1,
-    itemName: 'Cappaccino',
-    itemType: 'Coffee',
-    price: '1150.00',
-    description: 'new',
-    status: 'Active',
-    createdDate: '01-01-2025',
-    updatedDate: '01-01-2025',
-  },
-  {
-    id: 2,
-    itemName: 'Expresso',
-    itemType: 'Coffee',
-    price: '1150.00',
-    description: 'new',
-    status: 'Inactive',
-    createdDate: '01-01-2025',
-    updatedDate: '01-01-2025',
-  },
-]
-
-export const ItemDataTableMui = () => {
+export const ItemDataTableMui = ({ tableData, onDelete, onEditClick }) => {
   // Columns should be memoized or stable
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'id',
-        header: '#',
-        size: 50,
-      },
-      {
-        accessorKey: 'itemName',
+        accessorKey: 'name',
         header: 'Item Name',
-        size: 150,
-      },
-      {
-        accessorKey: 'itemType',
-        header: 'Item Type',
         size: 150,
       },
       {
@@ -53,29 +20,55 @@ export const ItemDataTableMui = () => {
         size: 150,
       },
       {
+        accessorKey: 'nozzle',
+        header: 'Nozzle Number',
+        size: 100,
+        Cell: ({ cell }) => (
+          <div className="d-flex justify-content-center">
+            <CBadge color="info">{cell.getValue()}</CBadge>
+          </div>
+        ),
+      },
+      {
         accessorKey: 'description',
         header: 'Description',
         size: 150,
       },
       {
-        accessorKey: 'status',
-        header: 'Status',
-        size: 100,
-        Cell: ({ cell }) => (
-          <CBadge color={cell.getValue() === 'Active' ? 'info' : 'danger'}>
-            {cell.getValue()}
-          </CBadge>
-        ),
-      },
-      {
-        accessorKey: 'createdDate',
+        accessorKey: 'createdAt',
         header: 'Created Date',
         size: 150,
+        Cell: ({ row }) => {
+          const date = new Date(row.original.updatedAt)
+          return date
+            .toLocaleString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true,
+            })
+            .replace(',', '') // Remove the comma
+        },
       },
       {
-        accessorKey: 'updatedDate',
+        accessorKey: 'updatedAt',
         header: 'Updated Date',
         size: 150,
+        Cell: ({ row }) => {
+          const date = new Date(row.original.updatedAt)
+          return date
+            .toLocaleString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true,
+            })
+            .replace(',', '') // Remove the comma
+        },
       },
       {
         id: 'actions', // Custom column for actions
@@ -83,10 +76,15 @@ export const ItemDataTableMui = () => {
         size: 200,
         Cell: ({ row }) => (
           <div>
-            <CButton color="warning" size="sm" className="me-1">
+            <CButton
+              color="warning"
+              size="sm"
+              className="me-1"
+              onClick={() => onEditClick(row.original)}
+            >
               <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
             </CButton>
-            <CButton color="danger" size="sm">
+            <CButton color="danger" size="sm" onClick={() => onDelete(row.original.id)}>
               <CIcon className="ml-2" icon={cilTrash} size="sm" />
             </CButton>
           </div>
@@ -98,7 +96,7 @@ export const ItemDataTableMui = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data, // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    data: tableData.data || [],
   })
 
   return <MaterialReactTable table={table} />
