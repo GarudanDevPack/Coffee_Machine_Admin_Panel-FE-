@@ -1,13 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect,useState } from 'react'
 import { CCard, CButton, CCardHeader, CCardBody } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
-import ItemDataTableMui from '../../../../components/tblcomponents/ItemTableWithFilter'
-import { AddAlertTypeModal, AddItemTypeModal, AddNotificationTypeModal } from '../../../modal/AddComponentModel'
-import ItemTypeDataTableMui from '../../../../components/tblcomponents/categories/ItemTypeTableWithFilter'
-import AlertTypeDataTableMui from '../../../../components/tblcomponents/categories/AlertTypeTableWithFilter'
 import NotificationTypeDataTableMui from '../../../../components/tblcomponents/categories/NotificationTypeTableWithFilter'
-
+import AddNotificationTypeModal from '../../../modal/AddNotificationTypeModal'
+import { useDispatch } from 'react-redux';
+import { deleteNotificationType, fetchNotificationType } from '../../../../actions/types/notificationTypeAction'
+import Swal from 'sweetalert2'
 /**
  * author Anushka Isuru Lakmal
  * created on 24-01-2025-15h-24m
@@ -17,7 +16,13 @@ import NotificationTypeDataTableMui from '../../../../components/tblcomponents/c
 
 
 const NotificationType = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false)
+    const [isModalVisible, setIsModalVisible] = useState(false)
+    const dispatch = useDispatch()
+    const [data, setData] = useState([])
+    const [refresh, setRefresh] = useState(false)
+    const [addOREdit, setAddOREdit] = useState(false)
+    const [editData, setEditData] = useState(null)
+    const [dataLength, setdataLength] = useState(null)
 
   // Function to store the time when the tab is hidden
   function saveLastLeftTime() {
@@ -27,6 +32,38 @@ const NotificationType = () => {
       console.log('Tab hidden at:', time)
     }
   }
+  const handleDelete = async (id) => {
+      //console.log(id)
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            await dispatch(deleteNotificationType(id));
+            Swal.fire('Deleted!', 'The item type has been deleted successfully.', 'success')
+  
+            setRefresh((prev) => !prev)
+          } catch (error) {
+            console.error('Failed to delete machine:', error)
+            Swal.fire('Error!', 'Failed to delete the machine. Please try again.', 'error')
+          }
+        }
+      })
+    }
+    //update
+  const handleOpenEditItemModal = (item) => {
+      //console.log(item)
+      setEditData(item)
+      setIsModalVisible(true)
+      setAddOREdit(false)
+    }
+  
 
   // Function to retrieve the last time the tab was left
   function getLastLeftTime() {
@@ -52,6 +89,39 @@ const NotificationType = () => {
       alert(message) // Optional: Show a friendly alert
     }
   })
+  const getData = async () => {
+    try {
+      const result = await dispatch(fetchNotificationType())
+      console.log('[Debugging] : p result - ', dataLength, 'now - ', result.length);
+      console.log('[Full JSON Response]', JSON.stringify(result, null, 2))
+      if (dataLength !== result.length) {
+        console.log('changed length')
+        setData(result)
+        setdataLength(result.length)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    getData()
+    const interval = setInterval(() => {
+      console.log('notificationType Function called at interval')
+      getData()
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [!isModalVisible, refresh])
+
+  // Function to save the last time the tab was left
+  function saveLastLeftTime() {
+    if (document.visibilityState === 'hidden') {
+      const time = new Date().toISOString()
+      localStorage.setItem('lastLeftTab', time)
+      console.log('Tab hidden at:', time)
+    }
+  }
 
   return (
     <>
@@ -72,14 +142,21 @@ const NotificationType = () => {
                 Add New Notification Type&nbsp;
                 <CIcon className="ml-2" icon={cilPlus} size="sm" />
               </CButton>
-              <AddNotificationTypeModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} />
+              <AddNotificationTypeModal visible={isModalVisible} onClose={() => setIsModalVisible(false)}
+              editData={editData}
+              addOREdit={addOREdit}
+              />
             </div>
           </div>
         </CCardHeader>
 
         <CCardBody className="mt-4">
           {/* <CustomerWalletDataTableMui /> */}
-          <NotificationTypeDataTableMui/>
+          <NotificationTypeDataTableMui
+          tableData={data}
+           onDelete={handleDelete}
+          onEditClick={handleOpenEditItemModal}
+          />
         </CCardBody>
       </CCard>
     </>
