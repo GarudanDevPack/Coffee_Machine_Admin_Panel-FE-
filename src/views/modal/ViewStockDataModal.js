@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CCard,
   CCardBody,
@@ -11,7 +11,8 @@ import {
   CRow,
   CBadge,
 } from '@coreui/react'
-
+import { fetchItemById } from '../../actions/itemAction';
+import { useDispatch } from 'react-redux';
 /**
  * author Anushka Isuru Lakmal
  * created on 25-04-2025-09h-30m
@@ -19,9 +20,37 @@ import {
  */
 
 const ViewStockDataModal = ({ visible, onClose, rowData }) => {
+  const [items, setItems] = useState([])
+  const dispatch = useDispatch();
   //   const [properties, setProperties] = useState([])
   //   const dummyData = ['Cappuccino 01', 'Tea 01', 'Water 01']
+  useEffect(() => {
 
+    console.log('Row Data:', rowData);
+  });
+ 
+useEffect(() => {
+  const fetchItems = async () => {
+    if (visible && rowData?.inventory) {
+      const itemNames = {};
+
+      for (const inv of rowData.inventory) {
+        try {
+          const res = await dispatch(fetchItemById(inv.item_id));
+          const name = res?.data?.[0]?.name || 'Unknown Item';
+          itemNames[inv.item_id] = name;
+        } catch (e) {
+          itemNames[inv.item_id] = 'Error Fetching';
+        }
+      }
+
+      setItems(itemNames);
+    }
+  };
+
+  fetchItems();
+}, [visible, rowData]);
+        ////
   const formatDate = (dateString) => {
     const options = {
       day: '2-digit',
@@ -54,40 +83,60 @@ const ViewStockDataModal = ({ visible, onClose, rowData }) => {
               <div className="mt-2" md={12}>
                 <CRow>
                   <CCol>
-                    <CFormLabel>Sales ID :</CFormLabel>
+                    <CFormLabel>item ID :</CFormLabel>
                   </CCol>
                   <CCol>
                     <CFormLabel>{rowData?.id || ''}</CFormLabel>
                   </CCol>
                 </CRow>
               </div>
-              <div className="mt-2" md={12}>
+              {/* <div className="mt-2" md={12}>
                 <CRow>
                   <CCol>
-                    <CFormLabel>Outlet :</CFormLabel>
+                    <CFormLabel>weight of packet :</CFormLabel>
                   </CCol>
                   <CCol>
-                    <CFormLabel>{rowData?.client?.name || ''}</CFormLabel>
+                    <CFormLabel>{rowData?.inventory?.packetofstock || ''}</CFormLabel>
                   </CCol>
                 </CRow>
               </div>
               <div className="mt-2" md={12}>
                 <CRow>
                   <CCol>
-                    <CFormLabel>Floor :</CFormLabel>
+                    <CFormLabel>remaining grams :</CFormLabel>
                   </CCol>
                   <CCol>
-                    <CFormLabel>{rowData?.org?.name || ''}</CFormLabel>
+                    <CFormLabel>{rowData?.org?.stock || ''}</CFormLabel>
                   </CCol>
                 </CRow>
-              </div>
+              </div> */}
+              <div className="mt-2" md={12}>
+  <CRow>
+    <CCol>
+      <CFormLabel>Inventory Details:</CFormLabel>
+    </CCol>
+    <CCol>
+      {rowData?.inventory?.map((inv, index) => (
+        <div key={index} style={{ marginBottom: '8px', paddingLeft: '10px' }}>
+          <div><strong>Item {index + 1}:</strong></div>
+          <div>Item name: {items[inv.item_id]}</div>
+          <div>Packet of Stock: {inv.packetofstock}</div>
+          <div>Stock: {inv.stock}</div>
+          <div>Qty: {inv.qty}</div>
+          <div>Cup Count: {inv.cupcount}</div>
+        </div>
+      ))}
+    </CCol>
+  </CRow>
+</div>
+
               <div className="mt-2" md={12}>
                 <CRow>
                   <CCol>
-                    <CFormLabel>Customer :</CFormLabel>
+                    <CFormLabel>no of cups :</CFormLabel>
                   </CCol>
                   <CCol>
-                    <CFormLabel>{rowData?.user?.name}</CFormLabel>
+                    <CFormLabel>{rowData?.user?.cupcount}</CFormLabel>
                   </CCol>
                 </CRow>
               </div>

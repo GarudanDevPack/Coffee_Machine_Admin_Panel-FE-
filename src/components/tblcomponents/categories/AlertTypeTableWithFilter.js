@@ -14,32 +14,32 @@ import { useDispatch } from 'react-redux';
 */
 
 
-const data = [
-  {
-    id: 1,
-    client: 'Garudan Pvt Ltd',
-    alertType: 'High',
-    status: 'Active',
-    createdDate: '01-01-2025',
-    updatedDate: '01-01-2025',
-  },
-  {
-    id: 1,
-    client: 'Garudan Pvt Ltd',
-    alertType: 'Low',
-    status: 'Active',
-    createdDate: '01-01-2025',
-    updatedDate: '01-01-2025',
-  },
-  {
-    id: 1,
-    client: 'Garudan Pvt Ltd',
-    alertType: 'High',
-    status: 'Inactive',
-    createdDate: '01-01-2025',
-    updatedDate: '01-01-2025',
-  },  
-]
+// const data = [
+//   {
+//     id: 1,
+//     client: 'Garudan Pvt Ltd',
+//     alertType: 'High',
+//     status: 'Active',
+//     createdDate: '01-01-2025',
+//     updatedDate: '01-01-2025',
+//   },
+//   {
+//     id: 1,
+//     client: 'Garudan Pvt Ltd',
+//     alertType: 'Low',
+//     status: 'Active',
+//     createdDate: '01-01-2025',
+//     updatedDate: '01-01-2025',
+//   },
+//   {
+//     id: 1,
+//     client: 'Garudan Pvt Ltd',
+//     alertType: 'High',
+//     status: 'Inactive',
+//     createdDate: '01-01-2025',
+//     updatedDate: '01-01-2025',
+//   },  
+// ]
 
 export const AlertTypeDataTableMui = ({tableData = {},onDelete,onEditClick}) => {
   const dispatch = useDispatch();
@@ -140,7 +140,7 @@ export const AlertTypeDataTableMui = ({tableData = {},onDelete,onEditClick}) => 
                          color="warning"
                          size="sm"
                          className="me-1"
-                         onClick={() => onEditClick(row.original)}
+                         onClick={() => onEditClick(row.original.rawData)}
                        >
                          <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
                        </CButton>

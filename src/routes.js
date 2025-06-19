@@ -16,6 +16,7 @@ const Items = React.lazy(() => import('./views/pages/nav/Items'))
 const ItemTypes = React.lazy(() => import('./views/pages/nav/categories/ItemType'))
 const AlertTypes = React.lazy(() => import('./views/pages/nav/categories/AlertType'))
 const NotificationTypes = React.lazy(() => import('./views/pages/nav/categories/NotificationType'))
+const Volume = React.lazy(() => import('./views/pages/nav/Volume'))
 
 const AddMachineModal = React.lazy(() =>
   import('./views/modal/AddComponentModel').then((module) => ({ default: module.AddMachineModal })),
@@ -147,7 +148,7 @@ const routes = [
   { path: '/categories/itemtypes', name: 'Item Types', element: ItemTypes },
   { path: '/categories/alerttypes', name: 'Alert Types', element: AlertTypes },
   { path: '/categories/notificationtypes', name: 'Notification Types', element: NotificationTypes },
-
+    { path: '/pages/nav/Volume', name: 'Volume', element: Volume },
   { path: '/modal/addmachinemodal', name: 'AddMachineModal', element: AddMachineModal },
   { path: '/modal/addcustomermodal', name: 'AddCustomerModal', element: AddCustomerModal },
   { path: '/modal/addmerchantmodal', name: 'AddMerchantModal', element: AddMerchantModal },

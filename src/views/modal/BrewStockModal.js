@@ -40,6 +40,10 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
   const [nozzle, setNozzle] = useState('')
   const [selectedOrg, setSelectedOrg] = useState('')
   const [isActive, setIsActive] = useState(false)
+  const [focusedField, setFocusedField] = useState(null)
+  const [packetAlertShown, setPacketAlertShown] = useState(false)
+  const [focusedInputIndex, setFocusedInputIndex] = useState(null);
+  
 
   const addProperty = () => {
     setProperties([...properties, { name: '', values: '' }])
@@ -60,6 +64,12 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
     if (field === 'stock' || field === 'qty') {
       value = value.replace(/[^0-9.]/g, '') // Allow only numeric input and decimals
     }
+
+    if (field === 'stock' || field === 'qty') {
+      //value = value.replace(/[^0-9.]/g, '') // Allow only numeric input and decimals
+      
+    }
+
 
     const updatedProperties = [...properties]
     updatedProperties[index] = { ...updatedProperties[index], [field]: value }
@@ -93,14 +103,15 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
     }
     // console.log(editData)
     if (editData) {
-      console.log(editData)
+      console.log("In here Edit data : ", editData)
       setSelectedId(editData.id || '')
       setMachineName(editData.name || '')
       setProperties(
         editData.inventory?.map((item) => ({
           item_id: item.item_id,
           nozzle: item.nozzle,
-          stock: item.stock.toString(),
+          packetofstock: item.packetofstock != null ? item.packetofstock.toString() : '',
+          stock: item.stock != null ? item.stock.toString() : '',
           qty: item.qty.toString(),
           cupcount: item.cupcount.toString(),
         })) || [],
@@ -121,19 +132,63 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
 
   // Handle save button click
   const handleSave = async () => {
-    // Construct the data object
+   for (const prop of properties) {
+    const packet = Number(prop.packetofstock)
+    const qty = Number(prop.qty)
+
+    if (!packet || !qty || qty === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Input',
+        text: 'Packet or cup count cannot be zero or empty.',
+      })
+      return
+    }
+
+    const ratio = packet / qty
+    if (ratio < 3 || ratio > 20) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Ratio',
+        text: `Packet to cup ratio must be between 3 grams  and 20 grans . Found ratio: ${ratio.toFixed(2)}`,
+      })
+      return
+    }
+  }
 
     let machine_id = selectedId
+
+    
     let data = {
       item_id: properties.map((prop) => prop.item_id),
       inventory: properties.map((prop) => ({
         item_id: prop.item_id,
         nozzle: prop.nozzle,
+        packetofstock: Number(prop.packetofstock),
         stock: Number(prop.stock),
         qty: Number(prop.qty),
         cupcount: Number(prop.qty),
       })),
     }
+    // if(packetofstock===stock && stock===cupcount){
+    //   data.inventory = properties.map((prop) => ({
+    //     item_id: prop.item_id,
+    //     nozzle: prop.nozzle,
+    //     packetofstock: Number(prop.packetofstock),
+    //     stock: Number(prop.stock),
+    //     qty: Number(prop.qty),
+    //     cupcount: Number(prop.qty),
+    //   }))
+    // }else{
+    //   data.inventory = properties.map((prop) => ({
+    //     item_id: prop.item_id,
+    //     nozzle: prop.nozzle,
+    //    // packetofstock: Number(prop.packetofstock),
+    //     stock: Number(prop.stock),
+    //     qty: Number(prop.qty),
+    //    // cupcount: Number(prop.cupcount),
+    //   }))
+    // }
     console.log('in edit mode : ', data)
     // }
 
@@ -224,22 +279,71 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
                               ))}
                             </CFormSelect>
                           </CCol>
-
-                          <CFormInput
+                         
+                            <CFormInput
                             type="text"
                             className="mb-0"
-                            value={property.stock}
-                            onChange={(e) => handlePropertyChange(index, 'stock', e.target.value)}
-                            placeholder="weight in gram"
-                          />
+                            value={property.packetofstock}
+                            onChange={(e) => handlePropertyChange(index, 'packetofstock', e.target.value)}
+                            title="Enter the total packet weight in grams"
+                            placeholder="packet of stock (grams)"
+                            onFocus={() => {
+  setFocusedInputIndex(index)
+  Swal.fire({
+    text: 'Enter packet in grams',
+    toast: true,
+    position: 'center',
+    showConfirmButton: false,
+    timer: 5000,
+    timerProgressBar: true,
+    icon: 'info',
+  })
+}}
+                            />
+             
+                          
                           <CFormInput
                             type="text"
                             className="mb-0"
                             value={property.qty}
                             onChange={(e) => handlePropertyChange(index, 'qty', e.target.value)}
                             placeholder="cup count"
+                             onFocus={() => {
+  setFocusedInputIndex(index)
+  Swal.fire({
+    text: 'Cups count',
+    toast: true,
+    position: 'center',
+    showConfirmButton: false,
+    timer: 5000,
+    timerProgressBar: true,
+    icon: 'info',
+  })
+}}
                           />
-
+<CFormInput
+  type="text"
+  className="mb-0"
+  value={
+    property.packetofstock && property.qty
+      ? (Number(property.packetofstock) / Number(property.qty)).toFixed(2)
+      : ''
+  }
+  placeholder="gram per cup"
+  readOnly
+   onFocus={() => {
+  setFocusedInputIndex(index)
+  Swal.fire({
+    text: 'grams that can be used for one cup',
+    toast: true,
+    position: 'center',
+    showConfirmButton: false,
+    timer: 5000,
+    timerProgressBar: true,
+    icon: 'info',
+  })
+}}
+/>
                           <CButton
                             color="danger"
                             type="button"
@@ -251,51 +355,9 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
                       )
                     })}
 
-                  {/* {properties.length > 0 &&
-                    properties.map((property, index) => (
-                      <div className="d-flex gap-2 mb-2" key={index}>
-                        <CCol>
-                          <CFormSelect
-                            style={{ minWidth: '200px' }}
-                            aria-label="Default select example"
-                            value={property.item_id}
-                            onChange={(e) => handlePropertyChange(index, 'item_id', e.target.value)}
-                          >
-                            <option>- Select -</option>
-                            {itemData.map((item) => (
-                              <option key={item.id} value={item.id}>
-                                {item.name}
-                              </option>
-                            ))}
-                          </CFormSelect>
-                        </CCol>
-                        <CCol>
-                          <CBadge color="success">{itemdata || ''}</CBadge>
-                        </CCol>
-                        <CFormInput
-                          type="text"
-                          className="mb-0"
-                          value={property.stock}
-                          onChange={(e) => handlePropertyChange(index, 'stock', e.target.value)}
-                          placeholder="weight in gram"
-                        />
-                        <CFormInput
-                          type="text"
-                          className="mb-0"
-                          value={property.qty}
-                          onChange={(e) => handlePropertyChange(index, 'qty', e.target.value)}
-                          placeholder="cup count"
-                        />
-                        <CButton color="danger" type="button" onClick={() => removeProperty(index)}>
-                          <CIcon className="ml-2" icon={cilTrash} size="sm" />
-                        </CButton>
-                      </div>
-                    ))} */}
+
                 </div>
               </CCol>
-              {/* <CCol xs={12} className="mt-3">
-                <CFormCheck id="isActiveCheck" label="Is Active" />
-              </CCol> */}
             </CRow>
           </CCardBody>
         </CCard>

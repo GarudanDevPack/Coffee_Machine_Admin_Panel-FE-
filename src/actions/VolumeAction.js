@@ -7,29 +7,29 @@
 import axios from 'axios'
 import { API_BASE_URL } from '../config/config'
 import {
-  ADD_ITEM,
-  DELETE_ITEM,
-  FETCH_ALL_ITEMS,
-  FETCH_ITEM_BY_CLIENT,
-  FETCH_ITEM_BY_ID,
-  UPDATE_ITEM_BY_ID,
+  ADD_VOLUMES,
+  DELETE_VOLUMES,
+  FETCH_ALL_VOLUMES,
+  FETCH_VOLUMES_BY_CLIENT,
+  FETCH_VOLUMES_BY_ID,
+  UPDATE_VOLUMES_BY_ID,
   // UPDATE_ITEM_TYPE_BY_ID,
 } from './types'
 
 export const fetchItemss = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/items`)
-    dispatch({ type: FETCH_ALL_ITEMS, payload: response.data })
+    const response = await axios.get(`${API_BASE_URL}/getvolume`)
+    dispatch({ type: FETCH_ALL_VOLUMES, payload: response.data })
     return response.data
   } catch (error) {
     console.error('Error :', error)
     return null
   }
 }
-//id eken fetch karanna
+
 export const fetchItemById = (id) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getitem?id=${id}`)
+    const response = await axios.get(`${API_BASE_URL}/getitem/${id}`)
     dispatch({ type: FETCH_ITEM_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
@@ -50,8 +50,8 @@ export const fetchItemsByClient = (client_id) => async (dispatch) => {
 
 export const addItem = (items) => async (dispatch) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/createitem`, items)
-    dispatch({ type: ADD_ITEM, payload: response.data })
+    const response = await axios.post(`${API_BASE_URL}/createvolume`, items)
+    dispatch({ type: ADD_VOLUMES, payload: response.data })
     return response.data
   } catch (error) {
     console.error('Error :', error)
@@ -73,9 +73,9 @@ export const addItem = (items) => async (dispatch) => {
 
 export const updateItemById = (item) => async (dispatch) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/updateitem`, item)
+    const response = await axios.put(`${API_BASE_URL}/updatevolume`, item)
     // console.log('Action response : ', response)
-    dispatch({ type: UPDATE_ITEM_BY_ID, payload: response.data })
+    dispatch({ type: UPDATE_VOLUMES_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
     console.error('Error adding machine:', error)

@@ -89,6 +89,12 @@ const _nav = [
     to: '/pages/nav/merchants',
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
   },
+  {
+    component: CNavItem,
+    name: 'Manage Volume',
+    to: '/pages/nav/volume',
+    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+  },
   //group content
   {
     component: CNavTitle,
