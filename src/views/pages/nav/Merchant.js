@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import Swal from 'sweetalert2'
 import { CCard, CButton, CCardHeader, CCardBody, CFormInput, CFormSelect } from '@coreui/react'
 import { cilPlus, cilFilter } from '@coreui/icons'
 import {
@@ -7,9 +9,11 @@ import {
   TableViewCustomerWithPagination,
 } from '../../../components/tblcomponents/CDataTable'
 import CIcon from '@coreui/icons-react'
-import { AddMerchantModal } from '../../modal/AddComponentModel'
+
 import CustomerDataTableMui from '../../../components/tblcomponents/DataTableWithFilter'
 import MerchantDataTableMui from '../../../components/tblcomponents/MerchantDataTableWithFilter'
+import { deleteClient, fetchClients } from '../../../actions/clientAction'
+import AddMerchantModal from '../../modal/AddMerchantModal'
 
 /**
  * author Anushka Isuru Lakmal
@@ -19,6 +23,113 @@ import MerchantDataTableMui from '../../../components/tblcomponents/MerchantData
 
 const Merchants = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const dispatch = useDispatch()
+  const [data, setData] = useState([])
+  const [refresh, setRefresh] = useState(false)
+  const [addOREdit, setAddOREdit] = useState(false)
+  const [editData, setEditData] = useState(null)
+  const [dataLength, setdataLength] = useState(null)
+  
+    const getData = async () => {
+      try {
+        const result = await dispatch(fetchClients())
+        console.log('[Debugging] : p result - ', dataLength, 'now - ', result.length);
+        if (dataLength !== result.length) {
+          console.log('changed length')
+          setData(result)
+          setdataLength(result.length)
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  
+    useEffect(() => {
+      getData()
+      const interval = setInterval(() => {
+        console.log('Function called at interval')
+        getData()
+      }, 2000)
+  
+      return () => clearInterval(interval)
+    }, [!isModalVisible, refresh])
+  
+    // Function to save the last time the tab was left
+    function saveLastLeftTime() {
+      if (document.visibilityState === 'hidden') {
+        const time = new Date().toISOString()
+        localStorage.setItem('lastLeftTab', time)
+        console.log('Tab hidden at:', time)
+      }
+    }
+  
+    // Function to retrieve and display the last time the tab was left in your local timezone
+    function getLastLeftTime() {
+      const lastLeft = localStorage.getItem('lastLeftTab')
+      if (lastLeft) {
+        const localTime = new Date(lastLeft).toLocaleString('en-US', {
+          timeZone: 'Asia/Colombo', // Replace with your region's time zone
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        })
+        console.log('Last time you left the tab (local time):', localTime)
+        return localTime
+      } else {
+        console.log('No record of when the tab was left.')
+        return null
+      }
+    }
+  
+    // Add event listener for visibility change
+    document.addEventListener('visibilitychange', saveLastLeftTime)
+  
+    // On page load, log the last time the tab was left in the local timezone
+    window.addEventListener('load', () => {
+      const lastLeftTime = getLastLeftTime()
+      if (lastLeftTime) {
+        const message = `Welcome back! You last left the tab at: ${lastLeftTime}`
+        console.log(message)
+        alert(message) // Optional: Show a friendly alert
+      }
+    })
+  
+    const handleOpenEditItemModal = (item) => {
+      //console.log(item)
+      setEditData(item)
+      setIsModalVisible(true)
+      setAddOREdit(false)
+       
+    }
+  
+    const handleDelete = async (id) => {
+      //console.log(id)
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            await dispatch(deleteClient(id))
+            Swal.fire('Deleted!', 'The merchant has been deleted successfully.', 'success')
+  
+            setRefresh((prev) => !prev)
+          } catch (error) {
+            console.error('Failed to delete machine:', error)
+            Swal.fire('Error!', 'Failed to delete the machine. Please try again.', 'error')
+          }
+        }
+      })
+    }
+
 
   return (
     <>
@@ -45,7 +156,10 @@ const Merchants = () => {
         </CCardHeader>
 
         <CCardBody className="mt-4">
-          <MerchantDataTableMui />
+          <MerchantDataTableMui 
+          tableData={data}
+            onDelete={handleDelete}
+            onEditClick={handleOpenEditItemModal}/>
           {/* <CustomerDataTableMui /> */}
         </CCardBody>
       </CCard>

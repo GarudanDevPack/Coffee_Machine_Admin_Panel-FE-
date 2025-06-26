@@ -47,20 +47,25 @@ export const addClient = (client) => async (dispatch) => {
   }
 }
 
-export const updateClientById = (id) => async (dispatch) => {
+export const updateClientById = (data) => async (dispatch) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/updateclient/${id}`)
-    dispatch({ type: UPDATE_CLIENT_BY_ID, payload: response.data })
-    return response.data
-  } catch (error) {
-    console.error('Error adding machine:', error)
-    return null
-  }
-}
+    console.log('Updating client with data:', data);
 
+    // ❗ Remove id from URL – backend expects it in body
+    const response = await axios.put(`${API_BASE_URL}/updateclient`, data);
+
+    dispatch({ type: UPDATE_CLIENT_BY_ID, payload: response.data.data });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating client:', error);
+    return null;
+  }
+};
 export const deleteClient = (id) => async (dispatch) => {
   try {
-    await axios.delete(`${API_BASE_URL}/deleteclient/${id}`)
+    await axios.delete(`${API_BASE_URL}/deleteclient`, {
+  data: { id }
+});
     dispatch({ type: DELETE_MACHINE, payload: id })
   } catch (error) {
     console.error('Error adding machine:', error)

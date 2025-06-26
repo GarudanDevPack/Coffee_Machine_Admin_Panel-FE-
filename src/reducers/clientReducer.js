@@ -13,8 +13,12 @@ import {
 } from '../actions/types'
 
 const initialState = {
-  clients: [],
+  
+  
+   clients: [],
+  clientsarr: [],
   client: null,
+  
 }
 
 const clientReducer = (state = initialState, action) => {
@@ -32,10 +36,19 @@ const clientReducer = (state = initialState, action) => {
     case ADD_CLIENT:
       return {
         ...state,
-        clients: [...state.clients, action.payload],
+         clients: Array.isArray(state.clients) 
+          ? [...state.clients, action.payload]
+          : [action.payload],
       }
-    case UPDATE_CLIENT_BY_ID:
-
+   case UPDATE_CLIENT_BY_ID:
+  return {
+    ...state,
+    clients: Array.isArray(state.clients)
+      ? state.clients.map((client) =>
+          client.id === action.payload.id ? action.payload : client
+        )
+      : [action.payload], // fallback: replace the whole thing
+  }
     case DELETE_CLIENT:
       return {
         ...state,
