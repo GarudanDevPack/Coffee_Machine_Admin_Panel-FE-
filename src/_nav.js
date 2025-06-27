@@ -134,12 +134,12 @@ const _nav = [
     component: CNavTitle,
     name: 'Notifications & Alerts',
   },
-  {
-    component: CNavItem,
-    name: 'Push Notifications',
-    to: '/pages/nav/pushnotifications',
-    icon: <CIcon icon={cilNewspaper} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavItem,
+  //   name: 'Push Notifications',
+  //   to: '/pages/nav/pushnotifications',
+  //   icon: <CIcon icon={cilNewspaper} customClassName="nav-icon" />,
+  // },
   {
     component: CNavItem,
     name: 'Alerts',

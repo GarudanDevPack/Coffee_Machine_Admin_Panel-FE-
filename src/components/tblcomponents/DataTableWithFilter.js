@@ -43,46 +43,46 @@ const data = [
   // Add more data as needed
 ];
 
-export const CustomerDataTableMui = () => {
+export const CustomerDataTableMui = ({ tableData, onDelete, onEditClick }) => {
   // Columns should be memoized or stable
   const columns = useMemo(() => [
+    // {
+    //   accessorKey: 'id',
+    //   header: '#',
+    //   size: 50,
+    // },
     {
-      accessorKey: 'id',
-      header: '#',
-      size: 50,
-    },
-    {
-      accessorKey: 'name.firstName', // Access nested data with dot notation
-      header: 'First Name',
-      size: 150,
-    },
-    {
-      accessorKey: 'name.lastName',
-      header: 'Last Name',
-      size: 150,
-    },
-    {
-      accessorKey: 'mobile',
-      header: 'Mobile No',
+      accessorKey: 'name', // Access nested data with dot notation
+      header: 'Name',
       size: 150,
     },
     {
       accessorKey: 'email',
-      header: 'Email',
-      size: 200,
-    },
-    {
-      accessorKey: 'gender',
-      header: 'Gender',
-      size: 100,
-    },
-    {
-      accessorKey: 'dob',
-      header: 'Date of Birth',
+      header: 'email',
       size: 150,
     },
     {
-      accessorKey: 'createdDate',
+      accessorKey: 'phone_number',
+      header: 'Mobile No',
+      size: 150,
+    },
+    {
+      accessorKey: 'role',
+      header: 'role',
+      size: 200,
+    },
+    // {
+    //   accessorKey: 'gender',
+    //   header: 'Gender',
+    //   size: 100,
+    // },
+    {
+      accessorKey: 'updatedAt',
+      header: 'updated date',
+      size: 150,
+    },
+    {
+      accessorKey: 'createdAt',
       header: 'Created Date',
       size: 150,
     },
@@ -92,10 +92,10 @@ export const CustomerDataTableMui = () => {
       size: 200,
       Cell: ({ row }) => (
         <div>
-          <CButton color="warning" size="sm" className="me-1">
+          {/* <CButton color="warning" size="sm" className="me-1">
             <CIcon icon={cilPenAlt} size="sm" />
-          </CButton>
-          <CButton color="danger" size="sm">
+          </CButton> */}
+          <CButton color="danger" size="sm" onClick={() => onDelete(row.original.id)}>
             <CIcon icon={cilTrash} size="sm" />
           </CButton>
         </div>
@@ -105,7 +105,7 @@ export const CustomerDataTableMui = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data, // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    data: tableData.data || [] // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
   });
 
   return <MaterialReactTable table={table} />;

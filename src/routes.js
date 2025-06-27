@@ -9,7 +9,7 @@ const Merchants = React.lazy(() => import('./views/pages/nav/Merchant'))
 const BrewStocks = React.lazy(() => import('./views/pages/nav/Stock'))
 const CustomerWallets = React.lazy(() => import('./views/pages/nav/CustomerWallet'))
 const SalesReportings = React.lazy(() => import('./views/pages/nav/Sales'))
-const PushNotificatons = React.lazy(() => import('./views/pages/nav/Notification'))
+//const PushNotificatons = React.lazy(() => import('./views/pages/nav/Notification'))
 const MachineAlerts = React.lazy(() => import('./views/pages/nav/Alert'))
 const Promotions = React.lazy(() => import('./views/pages/nav/Promotion'))
 const Items = React.lazy(() => import('./views/pages/nav/Items'))
@@ -139,7 +139,7 @@ const routes = [
   { path: '/pages/nav/brewstocks', name: 'BrewStocks', element: BrewStocks },
   { path: '/pages/nav/customerwallets', name: 'CustomerWallets', element: CustomerWallets },
   { path: '/pages/nav/salesreportings', name: 'SalesReportings', element: SalesReportings },
-  { path: '/pages/nav/pushnotifications', name: 'PushNotificatons', element: PushNotificatons },
+ // { path: '/pages/nav/pushnotifications', name: 'PushNotificatons', element: PushNotificatons },
   { path: '/pages/nav/machinealerts', name: 'MachineAlerts', element: MachineAlerts },
   { path: '/pages/nav/promotions', name: 'Promotions', element: Promotions },
   { path: '/pages/nav/items', name: 'Items', element: Items },

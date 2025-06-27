@@ -64,3 +64,11 @@ export const FETCH_VOLUMES_BY_ID = 'FETCH_VOLUMES_BY_ID'
 export const ADD_VOLUMES = 'ADD_VOLUMES'
 export const DELETE_VOLUMES = 'DELETE_VOLUMES'   
 export const UPDATE_VOLUMES_BY_ID = 'UPDATE_VOLUMES_BY_ID' 
+
+//customer backend user 
+export const FETCH_ALL_USERS = 'FETCH_ALL_USERS'
+export const FETCH_USERS_BY_ID = 'FETCH_USERS_BY_ID'
+export const ADD_USERS = 'ADD_USERS'
+export const DELETE_USERS = 'DELETE_USERS'
+export const UPDATE_USERS_BY_ID = 'UPDATE_USERS_BY_ID'
+export const UPDATE_USERS_BY_NUMBER = 'UPDATE_USERS_BY_NUMBER'
