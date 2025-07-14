@@ -11,6 +11,7 @@ import itemReducer from './itemReducer'
 import uiReducer from './uiReducer'
 import itemTypeReducer from './types/itemtypeReducer'
 import salesReducer from './salesRudecer'
+ import dashboardReducer from './dashBoardReducer'
 
 const rootReducer = combineReducers({
   machines: machineReducer,
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   sales: salesReducer,
   itemTypes: itemTypeReducer,
   ui: uiReducer,
+  dashboard: dashboardReducer,
 })
 
 export default rootReducer

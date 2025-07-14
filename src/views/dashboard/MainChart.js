@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react'
 import { CChartLine } from '@coreui/react-chartjs'
 import { getStyle } from '@coreui/utils'
 
-const MainChart = () => {
+const MainChart = ({ data, labels }) => {
   const chartRef = useRef(null)
 
   useEffect(() => {
@@ -25,7 +25,12 @@ const MainChart = () => {
       }
     })
   }, [chartRef])
+  const chartData = data || defaultData;
+  const chartLabels = labels || defaultLabels;
 
+  // Calculate max value for y-axis
+  const maxValue = Math.max(...chartData, 50); // At least 50 for better visualization
+  const yAxisMax = Math.ceil(maxValue * 1.2);
   const random = () => Math.round(Math.random() * 100)
 
   return (
@@ -33,51 +38,43 @@ const MainChart = () => {
       <CChartLine
         ref={chartRef}
         style={{ height: '300px', marginTop: '40px' }}
-        data={{
-          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+         data={{
+          labels: chartLabels,
           datasets: [
             {
-              label: 'My First dataset',
+              label: 'Orders',
               backgroundColor: `rgba(${getStyle('--cui-info-rgb')}, .1)`,
               borderColor: getStyle('--cui-info'),
               pointHoverBackgroundColor: getStyle('--cui-info'),
               borderWidth: 2,
-              data: [
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-              ],
+              data: chartData,
               fill: true,
             },
-            {
-              label: 'My Second dataset',
-              backgroundColor: 'transparent',
-              borderColor: getStyle('--cui-success'),
-              pointHoverBackgroundColor: getStyle('--cui-success'),
-              borderWidth: 2,
-              data: [
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-              ],
-            },
-            {
-              label: 'My Third dataset',
-              backgroundColor: 'transparent',
-              borderColor: getStyle('--cui-danger'),
-              pointHoverBackgroundColor: getStyle('--cui-danger'),
-              borderWidth: 1,
-              borderDash: [8, 5],
-              data: [65, 65, 65, 65, 65, 65, 65],
-            },
+            // {
+            //   label: 'My Second dataset',
+            //   backgroundColor: 'transparent',
+            //   borderColor: getStyle('--cui-success'),
+            //   pointHoverBackgroundColor: getStyle('--cui-success'),
+            //   borderWidth: 2,
+            //   data: [
+            //     random(50, 200),
+            //     random(50, 200),
+            //     random(50, 200),
+            //     random(50, 200),
+            //     random(50, 200),
+            //     random(50, 200),
+            //     random(50, 200),
+            //   ],
+            // },
+            // {
+            //   label: 'My Third dataset',
+            //   backgroundColor: 'transparent',
+            //   borderColor: getStyle('--cui-danger'),
+            //   pointHoverBackgroundColor: getStyle('--cui-danger'),
+            //   borderWidth: 1,
+            //   borderDash: [8, 5],
+            //   data: [65, 65, 65, 65, 65, 65, 65],
+            // },
           ],
         }}
         options={{
@@ -105,11 +102,11 @@ const MainChart = () => {
               grid: {
                 color: getStyle('--cui-border-color-translucent'),
               },
-              max: 250,
+              max: yAxisMax,
               ticks: {
                 color: getStyle('--cui-body-color'),
                 maxTicksLimit: 5,
-                stepSize: Math.ceil(250 / 5),
+                stepSize: Math.ceil(yAxisMax / 5),
               },
             },
           },
@@ -118,9 +115,9 @@ const MainChart = () => {
               tension: 0.4,
             },
             point: {
-              radius: 0,
+              radius: 4,
               hitRadius: 10,
-              hoverRadius: 4,
+              hoverRadius: 6,
               hoverBorderWidth: 3,
             },
           },
