@@ -41,18 +41,18 @@ const data = [
   },
 ]
 
-export const CustomerWalletDataTableMui = () => {
+export const CustomerWalletDataTableMui = ({ tableData}) => {
   // Columns should be memoized or stable
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'id',
-        header: '#',
+        accessorKey: 'phone',
+        header: 'Phone Number',
         size: 50,
       },
       {
-        accessorKey: 'customerId',
-        header: 'Customer Name',
+        accessorKey: 'currency',
+        header: 'currency',
         size: 150,
       },
       {
@@ -60,53 +60,58 @@ export const CustomerWalletDataTableMui = () => {
         header: 'Balance',
         size: 150,
       },
+     {
+  accessorKey: 'notifications_enabled',
+  header: 'Notifications',
+  size: 150,
+  Cell: ({ cell }) => (
+    <CBadge color={cell.getValue() ? 'success' : 'danger'}>
+      {cell.getValue() ? 'Enabled' : 'Disabled'}
+    </CBadge>
+  ),
+},
+      // {
+      //   accessorKey: 'status',
+      //   header: 'Card Status',
+      //   size: 100,
+      //   Cell: ({ cell }) => (
+      //     <CBadge color={cell.getValue() === 'Active' ? 'info' : 'danger'}>
+      //       {cell.getValue()}
+      //     </CBadge>
+      //   ),
+      // },
       {
-        accessorKey: 'serialNo',
-        header: 'Serial Number',
-        size: 150,
-      },
-      {
-        accessorKey: 'status',
-        header: 'Card Status',
-        size: 100,
-        Cell: ({ cell }) => (
-          <CBadge color={cell.getValue() === 'Active' ? 'info' : 'danger'}>
-            {cell.getValue()}
-          </CBadge>
-        ),
-      },
-      {
-        accessorKey: 'createdDate',
+        accessorKey: 'createdAt',
         header: 'Created Date',
         size: 150,
       },
       {
-        accessorKey: 'updatedDate',
+        accessorKey: 'updatedAt',
         header: 'Updated Date',
         size: 150,
       },
-      {
-        id: 'actions', // Custom column for actions
-        header: 'Action',
-        size: 200,
-        Cell: ({ row }) => (
-          <div>
-            <CButton color="warning" size="sm" className="me-1">
-              <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
-            </CButton>
-            <CButton color="danger" size="sm">
-              <CIcon className="ml-2" icon={cilTrash} size="sm" />
-            </CButton>
-          </div>
-        ),
-      },
+      // {
+      //   id: 'actions', // Custom column for actions
+      //   header: 'Action',
+      //   size: 200,
+      //   Cell: ({ row }) => (
+      //     <div>
+      //       <CButton color="warning" size="sm" className="me-1">
+      //         <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
+      //       </CButton>
+      //       <CButton color="danger" size="sm">
+      //         <CIcon className="ml-2" icon={cilTrash} size="sm" />
+      //       </CButton>
+      //     </div>
+      //   ),
+      // },
     ],
     [],
   )
 
   const table = useMaterialReactTable({
     columns,
-    data, // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+     data: tableData.data || [], // Data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
   })
 
   return <MaterialReactTable table={table} />
