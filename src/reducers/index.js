@@ -12,8 +12,10 @@ import uiReducer from './uiReducer'
 import itemTypeReducer from './types/itemtypeReducer'
 import salesReducer from './salesRudecer'
  import dashboardReducer from './dashBoardReducer'
+ import authReducer from './authReducer'
 
 const rootReducer = combineReducers({
+   auth: authReducer,
   machines: machineReducer,
   clients: clientReducer,
   items: itemReducer,

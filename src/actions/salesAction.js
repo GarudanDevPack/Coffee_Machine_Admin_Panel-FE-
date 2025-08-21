@@ -46,7 +46,9 @@ import { FETCH_ALL_ORDERS, FETCH_SALES_BY_ID } from './types'
 
 export const fetchSales = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/orders`)
+    const response = await axios.get(`${API_BASE_URL}/orders`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_ALL_ORDERS, payload: response.data })
     return response.data
   } catch (error) {
@@ -56,17 +58,19 @@ export const fetchSales = () => async (dispatch) => {
 }
 
 export const getOrders = async (token) => {
-  const response = await fetch(`${API_URL}/orders`, {
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
+  const response = await fetch(`${API_URL}/orders`
+   ,{
+  withCredentials: true,
+}
+  );
   return await response.json();
 };
 
 export const fetchSaleById = (id) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/orderbyid?id=${id}`)
+    const response = await axios.get(`${API_BASE_URL}/orderbyid?id=${id}`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_SALES_BY_ID, payload: response.data })
     return response.data
   } catch (error) {

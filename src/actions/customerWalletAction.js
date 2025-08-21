@@ -8,7 +8,9 @@ import {
 
 export const fetchWallets = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/wallets`)
+    const response = await axios.get(`${API_BASE_URL}/wallets`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_ALL_WALLETS, payload: response.data })
     return response.data
   } catch (error) {

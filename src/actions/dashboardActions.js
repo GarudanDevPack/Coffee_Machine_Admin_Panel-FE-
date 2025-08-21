@@ -17,7 +17,9 @@ import {
 export const fetchClientsForDashBoard = (client_id) => async (dispatch) => {
   dispatch({ type: FETCH_CLIENT_STATS });
   try {
-    const response = await axios.get(`${API_BASE_URL}/dashboard/client/${client_id}`);
+    const response = await axios.get(`${API_BASE_URL}/dashboard/client/${client_id}`, {
+  withCredentials: true,
+});
     const transformedData = {
       machineStats: response.data.machineStats || [],
       monthlyBreakdown: response.data.monthlyBreakdown || [],
@@ -38,7 +40,9 @@ export const fetchClientsForDashBoard = (client_id) => async (dispatch) => {
 export const fetchDashboardData = (client_id) => async (dispatch) => {
   dispatch({ type: FETCH_DASHBOARD_DATA })
   try {
-    const response = await axios.get(`${API_BASE_URL}/dashboard/data/${client_id}`)
+    const response = await axios.get(`${API_BASE_URL}/dashboard/data/${client_id}`, {
+  withCredentials: true,
+})
     
     const transformedData = {
       customers: {
@@ -77,7 +81,9 @@ export const fetchDashboardData = (client_id) => async (dispatch) => {
 export const fetchAllMerchants = () => async (dispatch) => {
   dispatch({ type: FETCH_ALL_MERCHANTS })
   try {
-    const response = await axios.get(`${API_BASE_URL}/dashboard/merchants`)
+    const response = await axios.get(`${API_BASE_URL}/dashboard/merchants`, {
+  withCredentials: true,
+})
     
     console.log('Fetched merchants:', response.data)
     
@@ -101,7 +107,9 @@ export const fetchAllMerchants = () => async (dispatch) => {
 export const fetchClientStats = (client_id) => async (dispatch) => {
   dispatch({ type: FETCH_CLIENT_STATS })
   try {
-    const response = await axios.get(`${API_BASE_URL}/dashboard/client/${client_id}/stats`)
+    const response = await axios.get(`${API_BASE_URL}/dashboard/client/${client_id}/stats`, {
+  withCredentials: true,
+})
     
     const transformedData = {
       machineStats: response.data.machineStats || [],

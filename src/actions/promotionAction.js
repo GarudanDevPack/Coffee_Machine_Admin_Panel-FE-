@@ -12,7 +12,9 @@ import {
 
 export const fetchPromotions = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/advertisements`)
+    const response = await axios.get(`${API_BASE_URL}/advertisements`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_ALL_PROMOTIONS, payload: response.data })
     return response.data
   } catch (error) {
@@ -23,7 +25,9 @@ export const fetchPromotions = () => async (dispatch) => {
 //id eken fetch karanna
 export const fetchPromotionsById = (id) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getadvertisement?id=${id}`)
+    const response = await axios.get(`${API_BASE_URL}/getadvertisement?id=${id}`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_PROMOTIONS_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
@@ -44,7 +48,9 @@ export const fetchPromotionsById = (id) => async (dispatch) => {
 
 export const addPromotions = (items) => async (dispatch) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/createadvertisement`, items)
+    const response = await axios.post(`${API_BASE_URL}/createadvertisement`, items,{
+  withCredentials: true,
+})
     dispatch({ type: ADD_PROMOTIONS, payload: response.data })
     return response.data
   } catch (error) {
@@ -67,7 +73,9 @@ export const addPromotions = (items) => async (dispatch) => {
 
 export const updatePromotionsById = (item) => async (dispatch) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/updateadvertisement`, item)
+    const response = await axios.put(`${API_BASE_URL}/updateadvertisement`, item,{
+  withCredentials: true,
+})
     // console.log('Action response : ', response)
     dispatch({ type: UPDATE_PROMOTIONS_BY_ID, payload: response.data })
     return response.data
@@ -80,6 +88,8 @@ export const updatePromotionsById = (item) => async (dispatch) => {
 export const deletePromotions = (id) => async (dispatch) => {
   try {
     axios.delete(`${API_BASE_URL}/deleteadvertisement`, {
+  withCredentials: true,
+
   data: { id }
 })
     dispatch({ type: DELETE_PROMOTIONS, payload: id })

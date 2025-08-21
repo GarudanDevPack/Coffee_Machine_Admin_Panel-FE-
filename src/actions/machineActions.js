@@ -20,7 +20,9 @@ import {
 
 export const fetchMachines = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getallmachinelogs`)
+    const response = await axios.get(`${API_BASE_URL}/getallmachinelogs`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_ALL_MACHINES, payload: response.data })
     return response.data
   } catch (error) {
@@ -32,7 +34,9 @@ export const fetchMachines = () => async (dispatch) => {
 export const fetchMachinesById = (client, org) => async (dispatch) => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/getallmachinebyclient?client_id=${client}&org_id=${org}`,
+      `${API_BASE_URL}/getallmachinebyclient?client_id=${client}&org_id=${org}`,{
+  withCredentials: true,
+}
     )
     dispatch({ type: FETCH_ALL_MACHINES_BY_CLIENT, payload: response.data })
     return response.data
@@ -44,7 +48,9 @@ export const fetchMachinesById = (client, org) => async (dispatch) => {
 
 export const fetchMachineStocks = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getallmachinestocks`)
+    const response = await axios.get(`${API_BASE_URL}/getallmachinestocks`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_ALL_MACHINES_STOCKS, payload: response.data })
     return response.data
   } catch (error) {
@@ -55,7 +61,9 @@ export const fetchMachineStocks = () => async (dispatch) => {
 export const fetchMachineStocksByClient = (client, org) => async (dispatch) => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/getallmachinestocks?client_id=${client}&org_id=${org}`,
+      `${API_BASE_URL}/getallmachinestocks?client_id=${client}&org_id=${org}`,{
+  withCredentials: true,
+}
     )
     dispatch({ type: FETCH_ALL_MACHINES_STOCKS_BY_CLIENT, payload: response.data })
     return response.data
@@ -67,7 +75,9 @@ export const fetchMachineStocksByClient = (client, org) => async (dispatch) => {
 
 export const fetchMachineById = (id) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getmachinelog?id=${id}`)
+    const response = await axios.get(`${API_BASE_URL}/getmachinelog?id=${id}`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_MACHINE_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
@@ -78,7 +88,9 @@ export const fetchMachineById = (id) => async (dispatch) => {
 
 export const addMachine = (machines) => async (dispatch) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/createmachinelog`, machines)
+    const response = await axios.post(`${API_BASE_URL}/createmachinelog`, machines,{
+  withCredentials: true,
+})
     dispatch({ type: ADD_MACHINE, payload: response.data })
     return response.data
   } catch (error) {
@@ -91,7 +103,9 @@ export const updateMachineById = (id, machine) => async (dispatch) => {
   try {
 
     console.log(id, machine)
-    const response = await axios.put(`${API_BASE_URL}/updatemachinelog?id=${id}`, machine)
+    const response = await axios.put(`${API_BASE_URL}/updatemachinelog?id=${id}`, machine,{
+  withCredentials: true,
+})
     dispatch({ type: UPDATE_MACHINE_BY_ID, payload: response.data })
     console.log(response.data)
     return response.data
@@ -103,7 +117,9 @@ export const updateMachineById = (id, machine) => async (dispatch) => {
 
 export const updateMachinestatus = (id) => async (dispatch) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/updatemachinelogstatus/${id}`)
+    const response = await axios.put(`${API_BASE_URL}/updatemachinelogstatus/${id}`,{
+  withCredentials: true,
+})
     dispatch({ type: UPDATE_MACHINE_STATUS, payload: response.data })
     return response.data
   } catch (error) {
@@ -114,7 +130,9 @@ export const updateMachinestatus = (id) => async (dispatch) => {
 
 export const deleteMachine = (id) => async (dispatch) => {
   try {
-    await axios.delete(`${API_BASE_URL}/deletemachinelog?id=${id}`)
+    await axios.delete(`${API_BASE_URL}/deletemachinelog?id=${id}`,{
+  withCredentials: true,
+})
     dispatch({ type: DELETE_MACHINE, payload: id })
   } catch (error) {
     console.error('Error adding machine:', error)

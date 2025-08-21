@@ -28,8 +28,7 @@ import { useParams } from 'react-router-dom';
 const colors = ['primary', 'success', 'warning', 'danger', 'info', 'secondary'];
 
 const Dashboard = () => {
-  const { client_id } = useParams();
-  const dispatch = useDispatch();
+   const dispatch = useDispatch();
   
   // Get data from Redux store (same as WidgetsDropdown)
   const dashboardState = useSelector((state) => state.dashboard);
@@ -45,37 +44,40 @@ const Dashboard = () => {
   } = dashboardState || {};
 
   // ALL HOOKS MUST BE DECLARED FIRST - BEFORE ANY CONDITIONAL RETURNS
-  const [chartData, setChartData] = useState([]);
-  const [clientId, setClientId] = useState(client_id || null);
-  const [showPopup, setShowPopup] = useState(!client_id);
-  const [monthlyItemData, setMonthlyItemData] = useState([]);
-  const [itemColors, setItemColors] = useState({});
+    const [chartData, setChartData] = useState([]);
+    const authUser = useSelector((state) => state.auth.user)
+    //const [showPopup, setShowPopup] = useState(false);
+    const clientId = authUser?.id
+    const [monthlyItemData, setMonthlyItemData] = useState([]);
+    const [itemColors, setItemColors] = useState({});
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   // Handle client ID prompt (similar to WidgetsDropdown)
-  useEffect(() => {
-    if (showPopup && !client_id) {
-      const inputId = prompt("Enter Client ID (e.g., 1):");
-      if (inputId) {
-        setClientId(inputId);
-        setShowPopup(false);
-      } else {
-        setShowPopup(false);
-      }
-    }
-  }, [showPopup, client_id]);
+ // useEffect(() => {
+  //   if (showPopup && !client_id) {
+  //     const inputId = prompt("Enter Client ID (e.g., 1):");
+  //     if (inputId) {
+  //       setClientId(inputId);
+  //       setShowPopup(false);
+  //     } else {
+  //       setShowPopup(false);
+  //     }
+  //   }
+  // }, [showPopup, client_id]);
 
   // Fetch data when clientId changes
-  useEffect(() => {
-    if (clientId) {
-      dispatch(fetchClientsForDashBoard(clientId))
-        .then(data => {
-          console.log('Fetched data:', data);
-        })
-        .catch(error => {
-          console.error('Fetch error:', error);
-        });
-    }
-  }, [clientId, dispatch]);
+ useEffect(() => {
+  if (clientId) {
+    dispatch(fetchClientsForDashBoard(clientId))
+      .then(data => {
+        console.log('Fetched dashboard data:', data)
+      })
+      .catch(err => {
+        console.error('Dashboard fetch error:', err)
+      })
+  }
+}, [clientId, dispatch])
 
   // Process chart data when clientStats changes
   useEffect(() => {
@@ -83,7 +85,7 @@ const Dashboard = () => {
       const monthlyData = clientStats.monthlyBreakdown;
       
       // Create data for all months (January-July 2025)
-      const fullYearData = Array.from({ length: 7 }, (_, i) => {
+      const fullYearData = Array.from({ length: 12 }, (_, i) => {
         const month = i + 1; // 1-7 for January-July
         const monthData = monthlyData.find(d => d.month === month && d.year === 2025);
         return {
@@ -113,9 +115,9 @@ const Dashboard = () => {
       setItemColors(colorMap);
       
       // Create monthly data structure
-      const monthlyData = Array.from({ length: 7 }, (_, i) => {
+      const monthlyData = Array.from({ length: 12 }, (_, i) => {
         const month = i + 1;
-        const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'][i];
+        const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul','aug','sep','oct','nov','dec'][i];
         
         // Get items for this month
         const monthItems = itemAnalysis.filter(item => 
@@ -194,7 +196,7 @@ const Dashboard = () => {
           ) : (
             <MainChart 
               data={chartData.map(item => item.orders)}
-              labels={['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']}
+              labels={['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul','aug','sep','oct','nov','dec']}
             />
           )}
         </CCardBody>

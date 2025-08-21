@@ -18,7 +18,9 @@ import {
 
 export const fetchCustomers = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/users`)
+    const response = await axios.get(`${API_BASE_URL}/users`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_ALL_USERS, payload: response.data })
     return response.data
   } catch (error) {
@@ -29,7 +31,9 @@ export const fetchCustomers = () => async (dispatch) => {
 //id eken fetch karanna
 export const fetchCustomerById = (id) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getuser?id=${id}`)
+    const response = await axios.get(`${API_BASE_URL}/getuser?id=${id}`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_USERS_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
@@ -39,7 +43,9 @@ export const fetchCustomerById = (id) => async (dispatch) => {
 }
 export const fetchCustomersByNumber = (number) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getuserbynumber?${number}`)
+    const response = await axios.get(`${API_BASE_URL}/getuserbynumber?${number}`,{
+  withCredentials: true,
+})
     dispatch({ type: UPDATE_USERS_BY_NUMBER, payload: response.data })
     return response.data
   } catch (error) {
@@ -50,7 +56,9 @@ export const fetchCustomersByNumber = (number) => async (dispatch) => {
 
 export const addCustomer = (customer) => async (dispatch) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/createuser`, customer)
+    const response = await axios.post(`${API_BASE_URL}/createuser`, customer,{
+  withCredentials: true,
+})
     dispatch({ type:  ADD_USERS, payload: response.data })
     return response.data
   } catch (error) {
@@ -73,7 +81,9 @@ export const addCustomer = (customer) => async (dispatch) => {
 
 export const updateCustomerById = (customer) => async (dispatch) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/updateuser`, customer)
+    const response = await axios.put(`${API_BASE_URL}/updateuser`, customer,{
+  withCredentials: true,
+})
     // console.log('Action response : ', response)
     dispatch({ type: UPDATE_USERS_BY_ID, payload: response.data })
     return response.data
@@ -86,6 +96,8 @@ export const updateCustomerById = (customer) => async (dispatch) => {
 export const deleteCustomer = (id) => async (dispatch) => {
   try {
     await axios.delete(`${API_BASE_URL}/deleteuser`, {
+  withCredentials: true,
+
   data: { id }
 });
     dispatch({ type: DELETE_USERS, payload: id })

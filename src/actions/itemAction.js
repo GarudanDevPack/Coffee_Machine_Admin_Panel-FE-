@@ -18,7 +18,9 @@ import {
 
 export const fetchItemss = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/items`)
+    const response = await axios.get(`${API_BASE_URL}/items`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_ALL_ITEMS, payload: response.data })
     return response.data
   } catch (error) {
@@ -29,7 +31,9 @@ export const fetchItemss = () => async (dispatch) => {
 //id eken fetch karanna
 export const fetchItemById = (id) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getitem?id=${id}`)
+    const response = await axios.get(`${API_BASE_URL}/getitem?id=${id}`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_ITEM_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
@@ -39,7 +43,9 @@ export const fetchItemById = (id) => async (dispatch) => {
 }
 export const fetchItemsByClient = (client_id) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/itemsbyclient?${client_id}`)
+    const response = await axios.get(`${API_BASE_URL}/itemsbyclient?${client_id}`,{
+  withCredentials: true,
+})
     dispatch({ type: FETCH_ITEM_BY_CLIENT, payload: response.data })
     return response.data
   } catch (error) {
@@ -50,7 +56,9 @@ export const fetchItemsByClient = (client_id) => async (dispatch) => {
 
 export const addItem = (items) => async (dispatch) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/createitem`, items)
+    const response = await axios.post(`${API_BASE_URL}/createitem`, items,{
+  withCredentials: true,
+})
     dispatch({ type: ADD_ITEM, payload: response.data })
     return response.data
   } catch (error) {
@@ -73,7 +81,9 @@ export const addItem = (items) => async (dispatch) => {
 
 export const updateItemById = (item) => async (dispatch) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/updateitem`, item)
+    const response = await axios.put(`${API_BASE_URL}/updateitem`, item,{
+  withCredentials: true,
+})
     // console.log('Action response : ', response)
     dispatch({ type: UPDATE_ITEM_BY_ID, payload: response.data })
     return response.data
@@ -85,7 +95,9 @@ export const updateItemById = (item) => async (dispatch) => {
 
 export const deleteItem = (id) => async (dispatch) => {
   try {
-    await axios.delete(`${API_BASE_URL}/deleteitem?id=${id}`)
+    await axios.delete(`${API_BASE_URL}/deleteitem?id=${id}`,{
+  withCredentials: true,
+})
     dispatch({ type: DELETE_ITEM, payload: id })
   } catch (error) {
     console.error('Error :', error)
