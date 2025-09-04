@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { CBadge, CButton, CTooltip } from '@coreui/react' // Import CoreUI buttons if needed
-import { cilPenAlt, cilLowVision } from '@coreui/icons'
+import { cilPenAlt, cilLowVision,cilTrash } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import ViewStockDataModal from '../../views/modal/ViewStockDataModal'
 
@@ -82,14 +82,14 @@ export const BrewStocksDataTableMui = ({ tableData, onEditClick }) => {
                 <CIcon className="ml-2" icon={cilPenAlt} size="sm" />
               </CButton>
             </CTooltip>
-            {/* <CTooltip
+            <CTooltip
               content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
               placement="top"
             >
               <CButton color="danger" size="sm">
                 <CIcon className="ml-2" icon={cilTrash} size="sm" />
               </CButton>
-            </CTooltip> */}
+            </CTooltip>
           </div>
         ),
       },

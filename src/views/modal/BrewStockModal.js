@@ -46,7 +46,9 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
   
 
   const addProperty = () => {
-    setProperties([...properties, { name: '', values: '' }])
+    
+    // setProperties([...properties, { name: '', values: '' }])
+    setProperties([...properties, { item_id: '', packetofstock: '', qty: '', nozzle: '' }])
   }
 
   const removeProperty = (index) => {
@@ -87,7 +89,10 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
 
   const getItemData = async () => {
     try {
-      const result = await dispatch(fetchItemsByClient('client_id=1&org_id=1'))
+      const clientId = selectedClient || editData?.client_id?.id || 1
+      const orgId = selectedOrg || editData?.org_id?.id || 1
+      const queryString = `client_id=${clientId}&org_id=${orgId}`
+      const result = await dispatch(fetchItemsByClient(queryString))
       setItemData(result.data)
       console.log(result.data)
     } catch (error) {
@@ -106,6 +111,8 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
       console.log("In here Edit data : ", editData)
       setSelectedId(editData.id || '')
       setMachineName(editData.name || '')
+       setSelectedClient(editData.client_id?.id || '')
+      setSelectedOrg(editData.org_id?.id || '')
       setProperties(
         editData.inventory?.map((item) => ({
           item_id: item.item_id,
@@ -146,7 +153,7 @@ const AddBrewStockModal = ({ visible, onClose, editData, addOREdit }) => {
     }
 
     const ratio = packet / qty
-    if (ratio < 3 || ratio > 20) {
+    if (ratio < 3 || ratio > 50) {
       Swal.fire({
         icon: 'warning',
         title: 'Invalid Ratio',

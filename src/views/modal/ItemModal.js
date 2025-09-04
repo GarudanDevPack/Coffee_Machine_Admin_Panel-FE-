@@ -193,6 +193,7 @@ const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
   }
 
   const handleSave = async () => {
+     const dbName = (itemName || '').replace(/\s+/g, '');
     let data = {}
     if (!editData) {
       data = {
@@ -204,7 +205,7 @@ const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
           id: Number(selectedOrg),
           name: organizations.find((type) => type.id.toString() === selectedOrg)?.name || '',
         },
-        name: itemName,
+        name: dbName,
         price: Number(price),
         item_size: 'full',
         item_type: {
@@ -226,7 +227,7 @@ const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
           id: Number(selectedOrg),
           name: organizations.find((type) => type.id.toString() === selectedOrg)?.name || '',
         },
-        name: itemName,
+        name: dbName,
         price: Number(price),
         item_size: 'full',
         item_type: {
