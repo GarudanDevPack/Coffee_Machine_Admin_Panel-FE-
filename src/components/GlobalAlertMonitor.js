@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchAlerts } from '../actions/alertActions' // ✅ Fixed path - removed 'redux/'
-import { fetchMachines } from '../actions/machineActions' // ✅ Fixed path - removed 'redux/'
+import { fetchAlerts } from '../actions/alertActions'
+import { fetchMachines } from '../actions/machineActions'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -17,8 +17,8 @@ const GlobalAlertMonitor = () => {
   const { alerts } = useSelector((state) => state.alerts)
   const { machines } = useSelector((state) => state.machines)
   const [machineMap, setMachineMap] = useState({})
-  const [hasCheckedInitialAlerts, setHasCheckedInitialAlerts] = useState(false)
-  const [previousAlerts, setPreviousAlerts] = useState([])
+  const hasCheckedInitialAlerts = useRef(false) // ✅ Changed to useRef
+  const previousAlertsRef = useRef([]) // ✅ Changed to useRef
 
   // Fetch alerts and machines on mount
   useEffect(() => {
@@ -57,7 +57,7 @@ const GlobalAlertMonitor = () => {
     if (alerts && alerts.length > 0 && Object.keys(machineMap).length > 0) {
       const currentAlerts = alerts || []
 
-      if (!hasCheckedInitialAlerts) {
+      if (!hasCheckedInitialAlerts.current) { // ✅ Use .current
         // ✅ ON LOGIN: Show all existing critical alerts
         console.log('[Global Alert] Checking for existing critical alerts on login...')
         const criticalAlerts = currentAlerts.filter(
@@ -80,11 +80,11 @@ const GlobalAlertMonitor = () => {
           console.log('[Global Alert] ✅ No critical alerts found - all good!')
         }
 
-        setHasCheckedInitialAlerts(true)
-        setPreviousAlerts(currentAlerts)
+        hasCheckedInitialAlerts.current = true // ✅ Use .current
+        previousAlertsRef.current = currentAlerts // ✅ Use .current
       } else {
         // ✅ AFTER LOGIN: Only show NEW critical alerts
-        const previousAlertIds = new Set(previousAlerts.map(a => a.id))
+        const previousAlertIds = new Set(previousAlertsRef.current.map(a => a.id)) // ✅ Use .current
 
         currentAlerts.forEach((alert) => {
           const isNew = !previousAlertIds.has(alert.id)
@@ -96,7 +96,7 @@ const GlobalAlertMonitor = () => {
             playAlertSound()
           } else if (isCritical && !isNew) {
             // Check if alert was escalated to critical
-            const oldAlert = previousAlerts.find(a => a.id === alert.id)
+            const oldAlert = previousAlertsRef.current.find(a => a.id === alert.id) // ✅ Use .current
             if (oldAlert && oldAlert.status !== 'level 04') {
               console.log('[Global Alert] 📈 Alert escalated to critical:', alert.machine_id)
               showCriticalAlert(alert, machineMap)
@@ -105,10 +105,10 @@ const GlobalAlertMonitor = () => {
           }
         })
 
-        setPreviousAlerts(currentAlerts)
+        previousAlertsRef.current = currentAlerts // ✅ Use .current
       }
     }
-  }, [alerts, machineMap, hasCheckedInitialAlerts, previousAlerts])
+  }, [alerts, machineMap]) // ✅ Removed hasCheckedInitialAlerts and previousAlerts from dependencies
 
   return <ToastContainer />
 }
