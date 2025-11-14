@@ -50,6 +50,14 @@ const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
   const [description, setDescription] = useState('')
   const [isActive, setIsActive] = useState(false)
 
+  const tidySpaces = (s = "") => s.replace(/\s+/g, " ").trim();
+
+// Unicode-safe: letters + spaces only
+const lettersAndSpacesOnly = (s = "") => /^[\p{L}\s]+$/u.test(s);
+
+// Unicode-safe: detect any digit (0–9 or other scripts)
+const hasAnyNumber = (s = "") => /[\p{N}]/u.test(s);
+
   const resetForm = () => {
     setProperties([])
     setClients([])
@@ -156,7 +164,7 @@ const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
 
   // Handle machine name change
   const handleItemNameChange = (event) => {
-    setItemName(event.target.value)
+   setItemName(tidySpaces(event.target.value));
   }
 
   const handleNozzleChange = (event) => {
@@ -193,7 +201,60 @@ const AddItemModal = ({ visible, onClose, editData, addOREdit }) => {
   }
 
   const handleSave = async () => {
+    // ---------- NAME VALIDATION ----------
+  const uiName = tidySpaces(itemName || '');
+  if (!uiName) {
+    Swal.fire({ icon: 'warning', title: 'Item name required', text: 'Please enter a name.' });
+    return;
+  }
+  // 🚫 block if name has ANY number (ASCII or Unicode)
+  if (hasAnyNumber(uiName)) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Invalid item name',
+      text: 'Item name cannot contain numbers (0–9). Please remove any digits.',
+    });
+    return;
+  }
+  // 🚫 block if other characters than letters/spaces
+  if (!lettersAndSpacesOnly(uiName)) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Invalid item name',
+      text: 'Use letters and spaces only.',
+    });
+    return;
+  }
+  // optional: enforce min/max length
+  if (uiName.length < 2 || uiName.length > 50) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Name length',
+      text: 'Item name must be between 2 and 50 characters.',
+    });
+    return;
+  }
      const dbName = (itemName || '').replace(/\s+/g, '');
+      if (!selectedClient) {
+    Swal.fire({ icon: 'warning', title: 'Client required', text: 'Please select a client.' });
+    return;
+  }
+  if (!selectedOrg) {
+    Swal.fire({ icon: 'warning', title: 'Organization required', text: 'Please select an organization.' });
+    return;
+  }
+  if (!selectedItemType) {
+    Swal.fire({ icon: 'warning', title: 'Item type required', text: 'Please select an item type.' });
+    return;
+  }
+  if (!selectedNozzle) {
+    Swal.fire({ icon: 'warning', title: 'Nozzle required', text: 'Please select a nozzle.' });
+    return;
+  }
+  if (!(Number(price) > 0)) {
+    Swal.fire({ icon: 'warning', title: 'Invalid price', text: 'Price must be greater than 0.' });
+    return;
+  }
     let data = {}
     if (!editData) {
       data = {

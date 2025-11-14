@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { CCard, CButton, CCardHeader, CCardBody } from '@coreui/react'
 import { cilPlus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import { AddAlertModal } from '../../modal/AddComponentModel'
+import { AddAlertModal } from '../../modal/AddAlertModal'
 import AlertDataTableMui from '../../../components/tblcomponents/AlertDataTableWithFilter'
 
 

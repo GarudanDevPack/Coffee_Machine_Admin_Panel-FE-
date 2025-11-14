@@ -19,7 +19,7 @@ import {
 } from '@coreui/icons'
 
 
-
+import GlobalAlertMonitor from '../../components/GlobalAlertMonitor'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
 import MainChart from './MainChart'
 import { fetchClientsForDashBoard } from '../../actions/dashboardActions';
@@ -128,6 +128,7 @@ const Dashboard = () => {
         const totalOrders = monthItems.reduce((sum, item) => sum + item.totalOrders, 0);
         
         return {
+
           month,
           monthName,
           items: monthItems.map(item => ({
@@ -177,6 +178,7 @@ const Dashboard = () => {
   return (
     <>
       <WidgetsDropdown className="mb-4" />
+       <GlobalAlertMonitor />
       <CCard className="mb-4">
         <CCardBody>
           <CRow>
