@@ -285,6 +285,85 @@ if (field === 'cupsize') value = String(value);
 //       console.error('Error saving data:', error)
 //     }
 //   }
+// const handleSave = async () => {
+//   // Validation logic (keep existing validation)
+//   for (const prop of properties) {
+//     const packet = Number(prop.packetofstock)
+//     const qty = Number(prop.qty)
+
+//     if (!packet || !qty || qty === 0) {
+//       Swal.fire({
+//         icon: 'warning',
+//         title: 'Invalid Input',
+//         text: 'Packet or cup count cannot be zero or empty.',
+//       })
+//       return
+//     }
+
+//     const ratio = packet / qty
+//     if (ratio < 3 || ratio > 29) {
+//       Swal.fire({
+//         icon: 'warning',
+//         title: 'Invalid Ratio',
+//         text: `Packet to cup ratio must be between 3 grams and 50 grams. Found ratio: ${ratio.toFixed(2)}`,
+//       })
+//       return
+//     }
+//   }
+
+//   let machine_id = selectedId
+  
+//   // FIXED: Properly calculate gramsPerCup for each item
+//   let data = {
+//     item_id: properties.map((prop) => prop.item_id),
+//     inventory: properties.map((prop) => {
+//       const packet = Number(prop.packetofstock) || 0
+//       const qty = Number(prop.qty) || 0
+      
+//       // Calculate gramsPerCup properly
+//       let gramsPerCup = 0
+//       if (qty > 0) {
+//         gramsPerCup = +(packet / qty).toFixed(2) // Use + to convert back to number
+//       }
+
+//       return {
+//         item_id: prop.item_id,
+//         nozzle: prop.nozzle,
+//         packetofstock: packet,
+//         stock: packet, // Initial stock equals packet weight
+//         qty: qty,
+//         cupcount: qty, // Initial cup count equals qty
+//         cupsize: Number(prop.cupsize) || 90,
+//         gramsPerCup: gramsPerCup
+//       }
+//     }),
+//   }
+
+//   try {
+//     console.log('[Debugging] : save content - ', data)
+//     let response = await dispatch(updateMachineById(machine_id, data))
+//     console.log('response : ', response)
+    
+//     if (response) {
+//       Swal.fire({
+//         title: 'Saved!',
+//         text: 'Stock is saved successfully!',
+//         icon: 'success',
+//       })
+//       resetForm()
+//       onClose()
+//     } else {
+//       Swal.fire({
+//         icon: 'error',
+//         title: 'Oops...',
+//         text: 'Something went wrong!',
+//       })
+//     }
+//   } catch (error) {
+//     console.error('Error saving data:', error)
+//   }
+// }
+//cluade
 const handleSave = async () => {
   // Validation logic (keep existing validation)
   for (const prop of properties) {
@@ -301,7 +380,7 @@ const handleSave = async () => {
     }
 
     const ratio = packet / qty
-    if (ratio < 3 || ratio > 20) {
+    if (ratio < 3 || ratio > 29) {
       Swal.fire({
         icon: 'warning',
         title: 'Invalid Ratio',
@@ -313,30 +392,61 @@ const handleSave = async () => {
 
   let machine_id = selectedId
   
-  // FIXED: Properly calculate gramsPerCup for each item
-  let data = {
-    item_id: properties.map((prop) => prop.item_id),
-    inventory: properties.map((prop) => {
-      const packet = Number(prop.packetofstock) || 0
-      const qty = Number(prop.qty) || 0
-      
-      // Calculate gramsPerCup properly
-      let gramsPerCup = 0
-      if (qty > 0) {
-        gramsPerCup = +(packet / qty).toFixed(2) // Use + to convert back to number
-      }
+  // 🔥 FIX: Fetch current inventory to preserve unchanged items
+  const currentMachine = await dispatch(fetchMachineById(machine_id))
+  const currentInventory = currentMachine?.data?.inventory || []
 
-      return {
-        item_id: prop.item_id,
-        nozzle: prop.nozzle,
-        packetofstock: packet,
-        stock: packet, // Initial stock equals packet weight
-        qty: qty,
-        cupcount: qty, // Initial cup count equals qty
-        cupsize: Number(prop.cupsize) || 90,
-        gramsPerCup: gramsPerCup
+  // Create a map of current inventory by item_id for easy lookup
+  const currentInventoryMap = new Map()
+  currentInventory.forEach(item => {
+    currentInventoryMap.set(item.item_id, item)
+  })
+
+  // Build inventory array with surgical updates
+  const updatedInventory = properties.map((prop) => {
+    const packet = Number(prop.packetofstock) || 0
+    const qty = Number(prop.qty) || 0
+    
+    // Calculate gramsPerCup
+    let gramsPerCup = 0
+    if (qty > 0) {
+      gramsPerCup = +(packet / qty).toFixed(2)
+    }
+
+    // Get existing item from current inventory
+    const existingItem = currentInventoryMap.get(prop.item_id)
+
+    // 🔥 KEY FIX: Only update stock/cupcount if packetofstock/qty changed
+    let finalStock = packet
+    let finalCupCount = qty
+
+    if (existingItem) {
+      // If packetofstock didn't change, keep existing stock
+      if (existingItem.packetofstock === packet) {
+        finalStock = existingItem.stock || packet
       }
-    }),
+      
+      // If qty didn't change, keep existing cupcount
+      if (existingItem.qty === qty) {
+        finalCupCount = existingItem.cupcount || qty
+      }
+    }
+
+    return {
+      item_id: prop.item_id,
+      nozzle: prop.nozzle,
+      packetofstock: packet,
+      stock: finalStock,           // ✅ Preserved if unchanged
+      qty: qty,
+      cupcount: finalCupCount,     // ✅ Preserved if unchanged
+      cupsize: Number(prop.cupsize) || 90,
+      gramsPerCup: gramsPerCup
+    }
+  })
+
+  let data = {
+    item_id: updatedInventory.map((item) => item.item_id),
+    inventory: updatedInventory,
   }
 
   try {
