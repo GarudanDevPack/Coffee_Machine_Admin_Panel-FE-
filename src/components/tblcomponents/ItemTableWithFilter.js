@@ -103,13 +103,21 @@
 // }
 
 // export default ItemDataTableMui
-import React, { useMemo } from 'react'
+import React, { useMemo,useState } from 'react'
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { CButton, CBadge, CTooltip } from '@coreui/react'
-import { cilPenAlt, cilTrash, cilStar } from '@coreui/icons'
+import { cilPenAlt, cilTrash, cilStar, cilLowVision } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
+import ViewItemCommentsModal from '../../views/modal/ViewItemCommentsModal'
+
 
 export const ItemDataTableMui = ({ tableData, onDelete, onEditClick }) => {
+  const [isCommentsModalVisible, setIsCommentsModalVisible] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
+   const handleViewComments = (item) => {
+    setSelectedItem(item)
+    setIsCommentsModalVisible(true)
+  }
   const columns = useMemo(
     () => [
       {
@@ -144,20 +152,35 @@ export const ItemDataTableMui = ({ tableData, onDelete, onEditClick }) => {
       },
       {
         accessorKey: 'latest_comment',
-        header: 'Latest Comment',
+        header: 'Comments',
         size: 200,
-        Cell: ({ cell }) => {
-          const comment = cell.getValue() || 'No comments yet';
+        Cell: ({ row }) => {
+          const comment = row.original.latest_comment || 'No comments yet';
           const truncated = comment.length > 50 
             ? `${comment.substring(0, 50)}...` 
             : comment;
           
-          return comment.length > 50 ? (
-            <CTooltip content={comment}>
-              <span className="text-muted fst-italic">{truncated}</span>
-            </CTooltip>
-          ) : (
-            <span className="text-muted fst-italic">{truncated}</span>
+          return (
+            <div className="d-flex align-items-center gap-2">
+              <CTooltip content="View all comments" placement="top">
+                <CButton
+                  color="success"
+                  size="sm"
+                  onClick={() => handleViewComments(row.original)}
+                >
+                  <CIcon icon={cilLowVision} size="sm" />
+                </CButton>
+              </CTooltip>
+              <div className="flex-grow-1">
+                {comment.length > 50 ? (
+                  <CTooltip content={comment}>
+                    <span className="text-muted fst-italic">{truncated}</span>
+                  </CTooltip>
+                ) : (
+                  <span className="text-muted fst-italic">{truncated}</span>
+                )}
+              </div>
+            </div>
           );
         },
       },
@@ -215,12 +238,20 @@ export const ItemDataTableMui = ({ tableData, onDelete, onEditClick }) => {
         Cell: ({ row }) => (
           <div className="d-flex gap-1">
             <CButton
-              color="warning"
-              size="sm"
-              onClick={() => onEditClick(row.original)}
-            >
-              <CIcon icon={cilPenAlt} size="sm" />
-            </CButton>
+  color="warning"
+  size="sm"
+  onClick={() => onEditClick(row.original)}
+>
+  <CIcon icon={cilPenAlt} size="sm" />
+</CButton>
+
+<CButton
+  color="danger"
+  size="sm"
+  onClick={() => onDelete(row.original.id)}
+>
+  <CIcon icon={cilTrash} size="sm" />
+</CButton>
             <CButton 
               color="danger" 
               size="sm" 
@@ -245,7 +276,18 @@ export const ItemDataTableMui = ({ tableData, onDelete, onEditClick }) => {
     },
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+  <>
+    <MaterialReactTable table={table} />
+    
+    {/* Comments Modal */}
+    <ViewItemCommentsModal
+      visible={isCommentsModalVisible}
+      onClose={() => setIsCommentsModalVisible(false)}
+      itemData={selectedItem}
+    />
+  </>
+);
 };
 
 export default ItemDataTableMui;

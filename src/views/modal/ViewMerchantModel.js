@@ -125,7 +125,7 @@ useEffect(() => {
   <CCol>
     <CFormLabel>Organization Names:</CFormLabel>
   </CCol>
-  <CCol>
+  {/* <CCol>
     {rowData?.org?.map((org, index) => (
       <div key={index} style={{ marginBottom: '8px', paddingLeft: '10px' }}>
         <div><strong>Organization {index + 1}:</strong></div>
@@ -135,7 +135,33 @@ useEffect(() => {
         </div>
       </div>
     ))}
-  </CCol>
+  </CCol> */}
+  <CCol>
+  {rowData?.org?.length > 0 ? (
+    rowData.org.map((org, index) => (
+      <div
+        key={index}
+        style={{ marginBottom: '8px', paddingLeft: '10px' }}
+      >
+        <div>
+          <strong>Organization {index + 1}:</strong>
+        </div>
+
+        <div>
+          Organization name: {org?.name || 'N/A'}
+        </div>
+
+        <div>
+          Location:
+          Latitude {org?.location?.latitude ?? 'N/A'},
+          Longitude {org?.location?.longitude ?? 'N/A'}
+        </div>
+      </div>
+    ))
+  ) : (
+    <span className="text-muted">No organizations available</span>
+  )}
+</CCol>
 </CRow>
 </div>
 

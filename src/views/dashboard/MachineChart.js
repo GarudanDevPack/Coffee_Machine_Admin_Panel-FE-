@@ -1,21 +1,28 @@
 import React from 'react'
 import { CChartDoughnut } from '@coreui/react-chartjs'
 import { getStyle } from '@coreui/utils'
-import { CRow, CCol, CCard, CCardBody } from '@coreui/react'
+import { CRow, CCol, CCard, CCardBody, CBadge } from '@coreui/react'
 
-const MachineChart = ({ data, year, month }) => {
+const MachineChart = ({ data, year, month, isSuperAdmin = false }) => {
   // Sort machines by total sales (descending)
   const sortedData = [...data].sort((a, b) => b.totalSales - a.totalSales);
   
-  // Prepare chart data
-  const machineLabels = sortedData.map(m => m.machineName || `Machine ${m.machine_id}`);
+  // Prepare chart data - show machine name (and client name if super admin)
+  const machineLabels = sortedData.map(m => {
+    const machineName = m.machineName || `Machine ${m.machine_id}`;
+    return isSuperAdmin && m.clientName 
+      ? `${machineName} (${m.clientName})` 
+      : machineName;
+  });
+  
   const salesData = sortedData.map(m => m.totalSales);
   
   // Generate vibrant colors for each machine
   const generateColors = (count) => {
     const baseColors = [
       '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', 
-      '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF9F40'
+      '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF9F40',
+      '#E7E9ED', '#36A2EB', '#FF6384', '#4BC0C0', '#FFCE56'
     ];
     return baseColors.slice(0, count);
   };
@@ -33,7 +40,12 @@ const MachineChart = ({ data, year, month }) => {
             padding: '30px',
             boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
           }}>
-            <h5 className="text-white mb-4 fw-bold">Coffee Machines Sales Distribution</h5>
+            <h5 className="text-white mb-4 fw-bold">
+              Coffee Machines Sales Distribution
+              {isSuperAdmin && (
+                <CBadge color="warning" className="ms-2">All Machines</CBadge>
+              )}
+            </h5>
             <div style={{ 
               background: 'rgba(255,255,255,0.95)',
               borderRadius: '12px',
@@ -137,6 +149,13 @@ const MachineChart = ({ data, year, month }) => {
                         {machine.machineName || `Machine ${machine.machine_id}`}
                       </h6>
                     </div>
+                    {isSuperAdmin && machine.clientName && (
+                      <div className="mb-2">
+                        <CBadge color="info" className="me-2">
+                          {machine.clientName}
+                        </CBadge>
+                      </div>
+                    )}
                     <div className="text-muted small">
                       <span className="me-3">
                         <i className="bi bi-cart3 me-1"></i>
@@ -184,6 +203,7 @@ const MachineChart = ({ data, year, month }) => {
                   <tr>
                     <th className="border-0 py-3">Rank</th>
                     <th className="border-0 py-3">Machine Name</th>
+                    {isSuperAdmin && <th className="border-0 py-3">Client</th>}
                     <th className="border-0 py-3 text-center">Total Orders</th>
                     <th className="border-0 py-3 text-center">Total Sales</th>
                     <th className="border-0 py-3 text-center">Customers</th>
@@ -234,6 +254,13 @@ const MachineChart = ({ data, year, month }) => {
                           </span>
                         </div>
                       </td>
+                      {isSuperAdmin && (
+                        <td className="align-middle">
+                          <CBadge color="info-subtle" textColor="info" className="px-2 py-1">
+                            {machine.clientName || 'N/A'}
+                          </CBadge>
+                        </td>
+                      )}
                       <td className="text-center align-middle">
                         <span className="badge bg-primary-subtle text-primary px-3 py-2">
                           {machine.totalOrders}
@@ -266,7 +293,7 @@ const MachineChart = ({ data, year, month }) => {
                   fontWeight: 'bold'
                 }}>
                   <tr>
-                    <td colSpan="2" className="py-3 border-0">
+                    <td colSpan={isSuperAdmin ? "3" : "2"} className="py-3 border-0">
                       <span className="text-primary fw-bold">TOTALS</span>
                     </td>
                     <td className="text-center py-3 border-0">
