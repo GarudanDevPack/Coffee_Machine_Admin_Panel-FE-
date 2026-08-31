@@ -1,170 +1,231 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import Swal from 'sweetalert2'
-import { CCard, CButton, CCardHeader, CCardBody, CFormInput, CFormSelect } from '@coreui/react'
-import { cilPlus, cilFilter } from '@coreui/icons'
 import {
-  TableViewCustomer,
-  TableViewCustomerWithFilter,
-  TableViewCustomerWithPagination,
-} from '../../../components/tblcomponents/CDataTable'
+  CCard,
+  CButton,
+  CCardHeader,
+  CCardBody,
+  CTable,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableBody,
+  CTableDataCell,
+  CBadge,
+  CSpinner,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CForm,
+  CFormInput,
+  CFormLabel,
+} from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import { cilPlus } from '@coreui/icons'
+import { fetchClients, addClient, deleteClient } from '../../../actions/clientAction'
 
-import CustomerDataTableMui from '../../../components/tblcomponents/DataTableWithFilter'
-import MerchantDataTableMui from '../../../components/tblcomponents/MerchantDataTableWithFilter'
-import { deleteClient, fetchClients } from '../../../actions/clientAction'
-import AddMerchantModal from '../../modal/AddMerchantModal'
-
-/**
- * author Anushka Isuru Lakmal
- * created on 02-01-2025-10h-30m
- * copyright 2025
- */
-
-const Merchants = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false)
+const Organizations = () => {
   const dispatch = useDispatch()
   const [data, setData] = useState([])
-  const [refresh, setRefresh] = useState(false)
-  const [addOREdit, setAddOREdit] = useState(false)
-  const [editData, setEditData] = useState(null)
-  const [dataLength, setdataLength] = useState(null)
-  
-    const getData = async () => {
-      try {
-        const result = await dispatch(fetchClients())
-        console.log('[Debugging] : p result - ', dataLength, 'now - ', result.length);
-        if (dataLength !== result.length) {
-          console.log('changed length')
-          setData(result)
-          setdataLength(result.length)
-        }
-      } catch (error) {
-        console.error(error)
-      }
+  const [loading, setLoading] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    clientUserId: '',
+    address: '',
+    phone: '',
+    email: '',
+    contractStart: '',
+    contractEnd: '',
+    notes: '',
+  })
+
+  const loadData = async () => {
+    setLoading(true)
+    try {
+      const result = await dispatch(fetchClients())
+      const list = Array.isArray(result) ? result : result?.data || []
+      setData(list)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
     }
-  
-    useEffect(() => {
-      getData()
-      const interval = setInterval(() => {
-        console.log('Function called at interval')
-        getData()
-      }, 2000)
-  
-      return () => clearInterval(interval)
-    }, [!isModalVisible, refresh])
-  
-    // Function to save the last time the tab was left
-    function saveLastLeftTime() {
-      if (document.visibilityState === 'hidden') {
-        const time = new Date().toISOString()
-        localStorage.setItem('lastLeftTab', time)
-        console.log('Tab hidden at:', time)
-      }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    const result = await dispatch(addClient({
+      ...formData,
+      contractStart: formData.contractStart || new Date().toISOString(),
+    }))
+    if (result) {
+      setModalVisible(false)
+      setFormData({ name: '', clientUserId: '', address: '', phone: '', email: '', contractStart: '', contractEnd: '', notes: '' })
+      loadData()
+      Swal.fire('Created!', 'Organization created successfully.', 'success')
+    } else {
+      Swal.fire('Error', 'Failed to create organization.', 'error')
     }
-  
-    // Function to retrieve and display the last time the tab was left in your local timezone
-    function getLastLeftTime() {
-      const lastLeft = localStorage.getItem('lastLeftTab')
-      if (lastLeft) {
-        const localTime = new Date(lastLeft).toLocaleString('en-US', {
-          timeZone: 'Asia/Colombo', // Replace with your region's time zone
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        })
-        console.log('Last time you left the tab (local time):', localTime)
-        return localTime
-      } else {
-        console.log('No record of when the tab was left.')
-        return null
-      }
-    }
-  
-    // Add event listener for visibility change
-    document.addEventListener('visibilitychange', saveLastLeftTime)
-  
-    // On page load, log the last time the tab was left in the local timezone
-    window.addEventListener('load', () => {
-      const lastLeftTime = getLastLeftTime()
-      if (lastLeftTime) {
-        const message = `Welcome back! You last left the tab at: ${lastLeftTime}`
-        console.log(message)
-        alert(message) // Optional: Show a friendly alert
+  }
+
+  const handleDelete = (id, name) => {
+    Swal.fire({
+      title: `Delete ${name}?`,
+      text: "This will deactivate the organization.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Delete',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await dispatch(deleteClient(id))
+        Swal.fire('Deleted!', 'Organization has been removed.', 'success')
+        loadData()
       }
     })
-  
-    const handleOpenEditItemModal = (item) => {
-      //console.log(item)
-      setEditData(item)
-      setIsModalVisible(true)
-      setAddOREdit(false)
-       
-    }
-  
-    const handleDelete = async (id) => {
-      //console.log(id)
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            await dispatch(deleteClient(id))
-            Swal.fire('Deleted!', 'The merchant has been deleted successfully.', 'success')
-  
-            setRefresh((prev) => !prev)
-          } catch (error) {
-            console.error('Failed to delete machine:', error)
-            Swal.fire('Error!', 'Failed to delete the machine. Please try again.', 'error')
-          }
-        }
-      })
-    }
+  }
 
+  const formatDate = (date) =>
+    date ? new Date(date).toLocaleDateString('en-GB') : '—'
 
   return (
     <>
       <CCard className="mb-4">
-        <CCardHeader>
-          {/* <div>Manage Customer</div> */}
-          <div className="d-flex justify-content-between align-items-center">
-            <div>Manage Merchants</div>
-
-            <div className="d-flex align-items-center">
-              {/* style={{ height: '100%' }}> */}
-              <CButton
-                color="info"
-                type="button"
-                onClick={() => setIsModalVisible(true)}
-                className="btn-default text-sm"
-              >
-                Add New Merchant&nbsp;
-                <CIcon className="ml-2" icon={cilPlus} size="sm" />
-              </CButton>
-              <AddMerchantModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} />
-            </div>
-          </div>
+        <CCardHeader className="d-flex justify-content-between align-items-center">
+          <span>Organizations</span>
+          <CButton color="info" size="sm" onClick={() => setModalVisible(true)}>
+            <CIcon icon={cilPlus} className="me-1" />
+            Add Organization
+          </CButton>
         </CCardHeader>
-
-        <CCardBody className="mt-4">
-          <MerchantDataTableMui 
-          tableData={data}
-            onDelete={handleDelete}
-            onEditClick={handleOpenEditItemModal}/>
-          {/* <CustomerDataTableMui /> */}
+        <CCardBody>
+          {loading ? (
+            <div className="text-center py-4">
+              <CSpinner color="primary" />
+            </div>
+          ) : (
+            <CTable hover responsive striped>
+              <CTableHead>
+                <CTableRow>
+                  <CTableHeaderCell>Org ID</CTableHeaderCell>
+                  <CTableHeaderCell>Name</CTableHeaderCell>
+                  <CTableHeaderCell>Email</CTableHeaderCell>
+                  <CTableHeaderCell>Phone</CTableHeaderCell>
+                  <CTableHeaderCell>Machines</CTableHeaderCell>
+                  <CTableHeaderCell>Agents</CTableHeaderCell>
+                  <CTableHeaderCell>Contract Start</CTableHeaderCell>
+                  <CTableHeaderCell>Status</CTableHeaderCell>
+                  <CTableHeaderCell>Actions</CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+              <CTableBody>
+                {data.length === 0 ? (
+                  <CTableRow>
+                    <CTableDataCell colSpan={9} className="text-center text-muted py-4">
+                      No organizations found
+                    </CTableDataCell>
+                  </CTableRow>
+                ) : (
+                  data.map((org) => (
+                    <CTableRow key={org._id}>
+                      <CTableDataCell>
+                        <small className="text-muted font-monospace">{org.orgId}</small>
+                      </CTableDataCell>
+                      <CTableDataCell><strong>{org.name}</strong></CTableDataCell>
+                      <CTableDataCell>{org.email || '—'}</CTableDataCell>
+                      <CTableDataCell>{org.phone || '—'}</CTableDataCell>
+                      <CTableDataCell>
+                        <CBadge color="primary">{org.machineIds?.length || 0}</CBadge>
+                      </CTableDataCell>
+                      <CTableDataCell>
+                        <CBadge color="info">{org.agentIds?.length || 0}</CBadge>
+                      </CTableDataCell>
+                      <CTableDataCell>{formatDate(org.contractStart)}</CTableDataCell>
+                      <CTableDataCell>
+                        <CBadge color={org.isActive ? 'success' : 'secondary'}>
+                          {org.isActive ? 'Active' : 'Inactive'}
+                        </CBadge>
+                      </CTableDataCell>
+                      <CTableDataCell>
+                        <CButton
+                          color="danger"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDelete(org._id, org.name)}
+                        >
+                          Delete
+                        </CButton>
+                      </CTableDataCell>
+                    </CTableRow>
+                  ))
+                )}
+              </CTableBody>
+            </CTable>
+          )}
         </CCardBody>
       </CCard>
+
+      {/* Create Organization Modal */}
+      <CModal visible={modalVisible} onClose={() => setModalVisible(false)}>
+        <CModalHeader>
+          <CModalTitle>Add Organization</CModalTitle>
+        </CModalHeader>
+        <CForm onSubmit={handleCreate}>
+          <CModalBody>
+            <div className="mb-3">
+              <CFormLabel>Organization Name *</CFormLabel>
+              <CFormInput name="name" value={formData.name} onChange={handleChange} required />
+            </div>
+            <div className="mb-3">
+              <CFormLabel>Client User ID *</CFormLabel>
+              <CFormInput name="clientUserId" value={formData.clientUserId} onChange={handleChange} required placeholder="User _id of the client account" />
+            </div>
+            <div className="mb-3">
+              <CFormLabel>Email</CFormLabel>
+              <CFormInput name="email" type="email" value={formData.email} onChange={handleChange} />
+            </div>
+            <div className="mb-3">
+              <CFormLabel>Phone</CFormLabel>
+              <CFormInput name="phone" value={formData.phone} onChange={handleChange} />
+            </div>
+            <div className="mb-3">
+              <CFormLabel>Address</CFormLabel>
+              <CFormInput name="address" value={formData.address} onChange={handleChange} />
+            </div>
+            <div className="mb-3">
+              <CFormLabel>Contract Start</CFormLabel>
+              <CFormInput name="contractStart" type="date" value={formData.contractStart} onChange={handleChange} />
+            </div>
+            <div className="mb-3">
+              <CFormLabel>Contract End</CFormLabel>
+              <CFormInput name="contractEnd" type="date" value={formData.contractEnd} onChange={handleChange} />
+            </div>
+            <div className="mb-3">
+              <CFormLabel>Notes</CFormLabel>
+              <CFormInput name="notes" value={formData.notes} onChange={handleChange} />
+            </div>
+          </CModalBody>
+          <CModalFooter>
+            <CButton color="secondary" onClick={() => setModalVisible(false)}>Cancel</CButton>
+            <CButton color="primary" type="submit">Create</CButton>
+          </CModalFooter>
+        </CForm>
+      </CModal>
     </>
   )
 }
 
-export default Merchants
+export default Organizations

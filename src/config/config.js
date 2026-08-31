@@ -4,7 +4,4 @@
  * copyright 2025
  */
 
-export const API_BASE_URL = //'https://coffee-be-deployement.vercel.app/api'
- 'http://localhost:5000/api'
-//'https://tsctrhl1-5000.asse.devtunnels.ms/api'
-//'http://localhost:5000/api'
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1'

@@ -1,11 +1,4 @@
-/**
- * author Anushka Isuru Lakmal
- * created on 17-02-2025-14h-37m
- * copyright 2025
- */
-
-import axios from 'axios'
-import { API_BASE_URL } from '../config/config'
+import api from '../config/axiosInstance'
 import {
   ADD_CLIENT,
   DELETE_MACHINE,
@@ -14,122 +7,99 @@ import {
   UPDATE_CLIENT_BY_ID,
 } from './types'
 
+// Organizations (replaces old /clientlogs)
 export const fetchClients = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/clientlogs`,{
-  withCredentials: true,
-})
+    const response = await api.get('/v1/organizations')
     dispatch({ type: FETCH_ALL_CLIENTS, payload: response.data })
     return response.data
   } catch (error) {
-    console.error('Error :', error)
+    console.error('Error fetching organizations:', error)
     return null
-  }
-}
-//new 
-export const fetchLoggedClient = () => async (dispatch) => {
-  try {
-    const { data } = await axios.get(`${API_BASE_URL}/loggedclient`, { withCredentials: true })
-    dispatch({ type: FETCH_CLIENT_BY_ID, payload: data })
-    return data
-  } catch (err) {
-    console.error('Error fetching logged client:', err)
-    return { success: false, message: 'Unable to fetch logged client' }
   }
 }
 
-// export const fetchClientById = (id) => async (dispatch) => {
-//   try {
-//     const response = await axios.get(`${API_BASE_URL}/getclientlog/${id}`,{
-//   withCredentials: true,
-// })
-//     dispatch({ type: FETCH_CLIENT_BY_ID, payload: response.data })
-//     return response.data
-//   } catch (error) {
-//     console.error('Error :', error)
-//     return null
-//   }
-// }
+export const fetchLoggedClient = () => async (dispatch) => {
+  try {
+    const { data } = await api.get('/v1/organizations/mine')
+    dispatch({ type: FETCH_CLIENT_BY_ID, payload: data })
+    return data
+  } catch (err) {
+    console.error('Error fetching logged client org:', err)
+    return { success: false, message: 'Unable to fetch organization' }
+  }
+}
+
 export const fetchClientById = (id) => async (dispatch) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/getclientlog`, 
-      { id }, // Send id in request body
-      { withCredentials: true }
-    )
+    const response = await api.get(`/v1/organizations/${id}`)
     dispatch({ type: FETCH_CLIENT_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
-    console.error('Error fetching client by ID:', error)
+    console.error('Error fetching org by id:', error)
     return null
   }
 }
+
 export const fetchCurrentClient = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getclientlog`, {
-      withCredentials: true,
-    })
+    const response = await api.get('/v1/organizations/mine')
     dispatch({ type: FETCH_CLIENT_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
-    console.error('Error fetching current client:', error)
+    console.error('Error fetching current org:', error)
     return null
   }
 }
 
 export const addClient = (client) => async (dispatch) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/createclient`, client,{
-  withCredentials: true,
-})
+    const response = await api.post('/v1/organizations', client)
     dispatch({ type: ADD_CLIENT, payload: response.data })
     return response.data
   } catch (error) {
-    console.error('Error :', error)
+    console.error('Error creating organization:', error)
     return null
   }
 }
 
-// export const updateClientById = (data) => async (dispatch) => {
-//   try {
-//     console.log('Updating client with data:', data);
-
-//     // ❗ Remove id from URL – backend expects it in body
-//     const response = await axios.put(`${API_BASE_URL}/updateclient`, data,{
-//   withCredentials: true,
-// });
-
-//     dispatch({ type: UPDATE_CLIENT_BY_ID, payload: response.data.data });
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error updating client:', error);
-//     return null;
-//   }
-// };
-export const updateClientById = (data) => async (dispatch) => {
+export const updateClientById = (id, data) => async (dispatch) => {
   try {
-    console.log('Updating client with data:', data);
-
-    // ❗ Remove id from URL – backend expects it in body
-    const response = await axios.put(`${API_BASE_URL}/updateclient`, data,{
-  withCredentials: true,
-});
-
-    dispatch({ type: UPDATE_CLIENT_BY_ID, payload: response.data.data });
-    return response.data;
+    const response = await api.patch(`/v1/organizations/${id}`, data)
+    dispatch({ type: UPDATE_CLIENT_BY_ID, payload: response.data })
+    return response.data
   } catch (error) {
-    console.error('Error updating client:', error);
-    return null;
+    console.error('Error updating organization:', error)
+    return null
   }
-};
+}
+
 export const deleteClient = (id) => async (dispatch) => {
   try {
-    await axios.delete(`${API_BASE_URL}/deleteclient`, {
-    withCredentials: true,
-    data: { id }
-});
+    await api.delete(`/v1/organizations/${id}`)
     dispatch({ type: DELETE_MACHINE, payload: id })
   } catch (error) {
-    console.error('Error adding machine:', error)
+    console.error('Error deleting organization:', error)
+    return null
+  }
+}
+
+export const assignMachineToOrg = (orgId, machineId) => async () => {
+  try {
+    const response = await api.post(`/v1/organizations/${orgId}/machines`, { machineId })
+    return response.data
+  } catch (error) {
+    console.error('Error assigning machine to org:', error)
+    return null
+  }
+}
+
+export const assignAgentToOrg = (orgId, agentId) => async () => {
+  try {
+    const response = await api.post(`/v1/organizations/${orgId}/agents`, { agentId })
+    return response.data
+  } catch (error) {
+    console.error('Error assigning agent to org:', error)
     return null
   }
 }

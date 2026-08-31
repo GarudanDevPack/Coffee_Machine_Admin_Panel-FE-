@@ -1,11 +1,4 @@
-/**
- * author Anushka Isuru Lakmal
- * created on 11-11-2025-10h-30m
- * copyright 2025
- */
-
-import axios from 'axios'
-import { API_BASE_URL } from '../config/config'
+import api from '../config/axiosInstance'
 import {
   FETCH_ALL_ALERTS,
   FETCH_ALERTS_BY_ID,
@@ -14,12 +7,9 @@ import {
   UPDATE_ALERTS_BY_ID,
 } from './types'
 
-// Fetch all alerts
 export const fetchAlerts = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/alerts`, {
-      withCredentials: true,
-    })
+    const response = await api.get('/v1/alerts')
     dispatch({ type: FETCH_ALL_ALERTS, payload: response.data })
     return response.data
   } catch (error) {
@@ -28,28 +18,20 @@ export const fetchAlerts = () => async (dispatch) => {
   }
 }
 
-// Fetch alert by ID
 export const fetchAlertById = (id) => async (dispatch) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/getalert`,
-      { id },
-      { withCredentials: true }
-    )
+    const response = await api.get(`/v1/alerts/${id}`)
     dispatch({ type: FETCH_ALERTS_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
-    console.error('Error fetching alert by ID:', error)
+    console.error('Error fetching alert by id:', error)
     return null
   }
 }
 
-// Add new alert
 export const addAlert = (alertData) => async (dispatch) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/createalert`, alertData, {
-      withCredentials: true,
-    })
+    const response = await api.post('/v1/alerts', alertData)
     dispatch({ type: ADD_ALERTS, payload: response.data })
     return response.data
   } catch (error) {
@@ -58,13 +40,21 @@ export const addAlert = (alertData) => async (dispatch) => {
   }
 }
 
-// Update alert by ID
-export const updateAlertById = (data) => async (dispatch) => {
+export const resolveAlert = (id) => async (dispatch) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/updatealert`, data, {
-      withCredentials: true,
-    })
-    dispatch({ type: UPDATE_ALERTS_BY_ID, payload: response.data.data })
+    const response = await api.patch(`/v1/alerts/${id}/resolve`)
+    dispatch({ type: UPDATE_ALERTS_BY_ID, payload: response.data })
+    return response.data
+  } catch (error) {
+    console.error('Error resolving alert:', error)
+    return null
+  }
+}
+
+export const updateAlertById = (id, data) => async (dispatch) => {
+  try {
+    const response = await api.patch(`/v1/alerts/${id}`, data)
+    dispatch({ type: UPDATE_ALERTS_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
     console.error('Error updating alert:', error)
@@ -72,13 +62,9 @@ export const updateAlertById = (data) => async (dispatch) => {
   }
 }
 
-// Delete alert
 export const deleteAlert = (id) => async (dispatch) => {
   try {
-    await axios.delete(`${API_BASE_URL}/deletealert`, {
-      withCredentials: true,
-      data: { id },
-    })
+    await api.delete(`/v1/alerts/${id}`)
     dispatch({ type: DELETE_ALERTS, payload: id })
     return { success: true }
   } catch (error) {

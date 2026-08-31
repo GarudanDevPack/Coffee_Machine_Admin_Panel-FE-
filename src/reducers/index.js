@@ -11,13 +11,15 @@ import itemReducer from './itemReducer'
 import uiReducer from './uiReducer'
 import itemTypeReducer from './types/itemtypeReducer'
 import salesReducer from './salesRudecer'
- import dashboardReducer from './dashBoardReducer'
- import authReducer from './authReducer'
+import dashboardReducer from './dashBoardReducer'
+import authReducer from './authReducer'
 import alertReducer from './alertReducer'
+import membershipReducer from './membershipReducer'
+import agentReducer from './agentReducer'
 
 const rootReducer = combineReducers({
-   auth: authReducer,
-   alerts: alertReducer,
+  auth: authReducer,
+  alerts: alertReducer,
   machines: machineReducer,
   clients: clientReducer,
   items: itemReducer,
@@ -25,6 +27,8 @@ const rootReducer = combineReducers({
   itemTypes: itemTypeReducer,
   ui: uiReducer,
   dashboard: dashboardReducer,
+  memberships: membershipReducer,
+  agents: agentReducer,
 })
 
 export default rootReducer

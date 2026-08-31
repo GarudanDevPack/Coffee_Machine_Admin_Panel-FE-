@@ -56,12 +56,12 @@ export const MachineDataTableMui = ({
         size: 150,
       },
       {
-        accessorKey: 'status',
+        id: 'status',
         header: 'Status',
         size: 100,
-        Cell: ({ cell }) => (
-          <CBadge color={cell.getValue() === 'online' ? 'success' : 'danger'}>
-            {cell.getValue()}
+        Cell: ({ row }) => (
+          <CBadge color={row.original.isOnline ? 'success' : 'danger'}>
+            {row.original.isOnline ? 'Online' : 'Offline'}
           </CBadge>
         ),
       },
@@ -119,7 +119,7 @@ export const MachineDataTableMui = ({
         size: 100,
         Cell: ({ row }) => {
           const isOffline =
-            row.original.status !== 'online' && row.original.error !== 'Sleep_Mode_ON'
+            !row.original.isOnline && row.original.error !== 'Sleep_Mode_ON'
           const isColorButton = row.original.error !== 'Sleep_Mode_ON'
           // console.log(isOffline)
           return (

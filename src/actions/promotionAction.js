@@ -1,100 +1,73 @@
-
-import axios from 'axios'
-import { API_BASE_URL } from '../config/config'
+import api from '../config/axiosInstance'
 import {
   ADD_PROMOTIONS,
   DELETE_PROMOTIONS,
   FETCH_ALL_PROMOTIONS,
   FETCH_PROMOTIONS_BY_ID,
   UPDATE_PROMOTIONS_BY_ID,
-  // UPDATE_ITEM_TYPE_BY_ID,
 } from './types'
 
 export const fetchPromotions = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/advertisements`,{
-  withCredentials: true,
-})
+    const response = await api.get('/v1/promotions')
     dispatch({ type: FETCH_ALL_PROMOTIONS, payload: response.data })
     return response.data
   } catch (error) {
-    console.error('Error :', error)
+    console.error('Error fetching promotions:', error)
     return null
   }
 }
-//id eken fetch karanna
+
+export const fetchActivePromotions = () => async (dispatch) => {
+  try {
+    const response = await api.get('/v1/promotions/active')
+    dispatch({ type: FETCH_ALL_PROMOTIONS, payload: response.data })
+    return response.data
+  } catch (error) {
+    console.error('Error fetching active promotions:', error)
+    return null
+  }
+}
+
 export const fetchPromotionsById = (id) => async (dispatch) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getadvertisement?id=${id}`,{
-  withCredentials: true,
-})
+    const response = await api.get(`/v1/promotions/${id}`)
     dispatch({ type: FETCH_PROMOTIONS_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
-    console.error('Error :', error)
+    console.error('Error fetching promotion by id:', error)
     return null
   }
 }
-// export const fetchItemsByClient = (client_id) => async (dispatch) => {
-//   try {
-//     const response = await axios.get(`${API_BASE_URL}/itemsbyclient?${client_id}`)
-//     dispatch({ type: FETCH_ITEM_BY_CLIENT, payload: response.data })
-//     return response.data
-//   } catch (error) {
-//     console.error('Error :', error)
-//     return null
-//   }
-// }
 
-export const addPromotions = (items) => async (dispatch) => {
+export const addPromotions = (promotion) => async (dispatch) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/createadvertisement`, items,{
-  withCredentials: true,
-})
+    const response = await api.post('/v1/promotions', promotion)
     dispatch({ type: ADD_PROMOTIONS, payload: response.data })
     return response.data
   } catch (error) {
-    console.error('Error :', error)
+    console.error('Error adding promotion:', error)
     return null
   }
 }
 
-// export const updateItemById = (item) => async (dispatch) => {
-//   try {
-//     const response = await axios.put(`${API_BASE_URL}/updateitem`, item)
-//     console.log(response)
-//     dispatch({ type: UPDATE_ITEM_BY_ID, payload: response.data })
-//     return response.data
-//   } catch (error) {
-//     console.error('Error :', error)
-//     return null
-//   }
-// }
-
-export const updatePromotionsById = (item) => async (dispatch) => {
+export const updatePromotionsById = (id, promotion) => async (dispatch) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/updateadvertisement`, item,{
-  withCredentials: true,
-})
-    // console.log('Action response : ', response)
+    const response = await api.patch(`/v1/promotions/${id}`, promotion)
     dispatch({ type: UPDATE_PROMOTIONS_BY_ID, payload: response.data })
     return response.data
   } catch (error) {
-    console.error('Error adding machine:', error)
+    console.error('Error updating promotion:', error)
     return null
   }
 }
 
 export const deletePromotions = (id) => async (dispatch) => {
   try {
-    axios.delete(`${API_BASE_URL}/deleteadvertisement`, {
-  withCredentials: true,
-
-  data: { id }
-})
+    await api.delete(`/v1/promotions/${id}`)
     dispatch({ type: DELETE_PROMOTIONS, payload: id })
   } catch (error) {
-    console.error('Error :', error)
+    console.error('Error deleting promotion:', error)
     return null
   }
 }

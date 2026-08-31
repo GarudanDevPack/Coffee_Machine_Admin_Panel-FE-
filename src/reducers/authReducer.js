@@ -7,6 +7,8 @@ import {
 
 const initialState = {
   user: null,
+  token: localStorage.getItem('accessToken') || null,
+  role: null,
   loading: false,
   error: null,
 }
@@ -17,13 +19,20 @@ const authReducer = (state = initialState, action) => {
       return { ...state, loading: true, error: null }
 
     case LOGIN_SUCCESS:
-      return { ...state, user: action.payload, loading: false, error: null }
+      return {
+        ...state,
+        user: action.payload.user,
+        token: action.payload.token,
+        role: action.payload.role,
+        loading: false,
+        error: null,
+      }
 
     case LOGIN_FAILURE:
       return { ...state, error: action.payload, loading: false }
 
     case LOGOUT_USER:
-      return { ...initialState }
+      return { ...initialState, token: null }
 
     default:
       return state

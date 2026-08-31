@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useNavigate, Link } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -8,28 +8,29 @@ import {
   CContainer,
   CForm,
   CFormInput,
+  CFormSelect,
   CInputGroup,
   CInputGroupText,
   CRow,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser, cilPhone, cilInstitution } from '@coreui/icons'
-import { addClient } from '../../../actions/clientAction' // ✅ Adjust path as needed
+import { cilLockLocked, cilUser, cilPhone, cilEnvelopeClosed } from '@coreui/icons'
+import { registerUser } from '../../../actions/authLoginActions'
 
 const Register = () => {
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    phone_number: '',
+    phone: '',
     password: '',
-    repeat_password: '',
-    organization: '',
+    repeatPassword: '',
   })
-
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -40,31 +41,29 @@ const Register = () => {
     setError(null)
     setSuccess(null)
 
-    if (formData.password !== formData.repeat_password) {
+    if (formData.password !== formData.repeatPassword) {
       return setError('Passwords do not match')
     }
-
-    const payload = {
-      name: formData.name,
-      email: formData.email,
-      phone_number: formData.phone_number,
-      password: formData.password,
-      org: [{
-        id: Math.floor(Math.random() * 100000), // Can replace with proper org management
-        name: formData.organization,
-        location: {
-          latitude: 0,
-          longitude: 0,
-        },
-      }],
+    if (formData.password.length < 6) {
+      return setError('Password must be at least 6 characters')
     }
 
-    const response = await dispatch(addClient(payload))
-    if (response?.success) {
-      setSuccess('Account created successfully')
-      setFormData({ name: '', email: '', phone_number: '', password: '', repeat_password: '', organization: '' })
+    setLoading(true)
+    const result = await registerUser({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      password: formData.password,
+    })()
+
+    setLoading(false)
+    if (result?.success) {
+      setSuccess('Account created successfully! Redirecting to login...')
+      setFormData({ firstName: '', lastName: '', email: '', phone: '', password: '', repeatPassword: '' })
+      setTimeout(() => navigate('/login'), 2000)
     } else {
-      setError('Account creation failed')
+      setError(result?.message || 'Registration failed. Please try again.')
     }
   }
 
@@ -73,31 +72,48 @@ const Register = () => {
       <CContainer>
         <CRow className="justify-content-center">
           <CCol md={9} lg={7} xl={6}>
-            <CCard className="mx-4">
+            <CCard className="mx-4 shadow-sm">
               <CCardBody className="p-4">
                 <CForm onSubmit={handleSubmit}>
-                  <h1>Register</h1>
-                  <p className="text-body-secondary">Create your account</p>
+                  <h1 className="mb-1">Create Account</h1>
+                  <p className="text-body-secondary mb-4">
+                    Register for QFOX management access
+                  </p>
+
+                  <CRow className="g-2 mb-3">
+                    <CCol sm={6}>
+                      <CInputGroup>
+                        <CInputGroupText>
+                          <CIcon icon={cilUser} />
+                        </CInputGroupText>
+                        <CFormInput
+                          name="firstName"
+                          placeholder="First Name"
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          required
+                        />
+                      </CInputGroup>
+                    </CCol>
+                    <CCol sm={6}>
+                      <CFormInput
+                        name="lastName"
+                        placeholder="Last Name"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        required
+                      />
+                    </CCol>
+                  </CRow>
 
                   <CInputGroup className="mb-3">
                     <CInputGroupText>
-                      <CIcon icon={cilUser} />
+                      <CIcon icon={cilEnvelopeClosed} />
                     </CInputGroupText>
-                    <CFormInput
-                      name="name"
-                      placeholder="Username"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                    />
-                  </CInputGroup>
-
-                  <CInputGroup className="mb-3">
-                    <CInputGroupText>@</CInputGroupText>
                     <CFormInput
                       name="email"
                       type="email"
-                      placeholder="Email"
+                      placeholder="Email address"
                       value={formData.email}
                       onChange={handleChange}
                       required
@@ -109,24 +125,10 @@ const Register = () => {
                       <CIcon icon={cilPhone} />
                     </CInputGroupText>
                     <CFormInput
-                      name="phone_number"
-                      placeholder="Phone Number"
-                      value={formData.phone_number}
+                      name="phone"
+                      placeholder="Phone (e.g. 0771234567)"
+                      value={formData.phone}
                       onChange={handleChange}
-                      required
-                    />
-                  </CInputGroup>
-
-                  <CInputGroup className="mb-3">
-                    <CInputGroupText>
-                      <CIcon icon={cilInstitution} />
-                    </CInputGroupText>
-                    <CFormInput
-                      name="organization"
-                      placeholder="Organization"
-                      value={formData.organization}
-                      onChange={handleChange}
-                      required
                     />
                   </CInputGroup>
 
@@ -137,7 +139,7 @@ const Register = () => {
                     <CFormInput
                       name="password"
                       type="password"
-                      placeholder="Password"
+                      placeholder="Password (min 6 characters)"
                       value={formData.password}
                       onChange={handleChange}
                       required
@@ -149,22 +151,33 @@ const Register = () => {
                       <CIcon icon={cilLockLocked} />
                     </CInputGroupText>
                     <CFormInput
-                      name="repeat_password"
+                      name="repeatPassword"
                       type="password"
-                      placeholder="Repeat Password"
-                      value={formData.repeat_password}
+                      placeholder="Confirm Password"
+                      value={formData.repeatPassword}
                       onChange={handleChange}
                       required
                     />
                   </CInputGroup>
 
-                  {error && <p className="text-danger">{error}</p>}
-                  {success && <p className="text-success">{success}</p>}
+                  {error && (
+                    <div className="alert alert-danger py-2 mb-3">{error}</div>
+                  )}
+                  {success && (
+                    <div className="alert alert-success py-2 mb-3">{success}</div>
+                  )}
 
-                  <div className="d-grid">
-                    <CButton color="success" type="submit">
-                      Create Account
+                  <div className="d-grid mb-3">
+                    <CButton color="success" type="submit" disabled={loading}>
+                      {loading ? 'Creating Account...' : 'Create Account'}
                     </CButton>
+                  </div>
+
+                  <div className="text-center">
+                    <small className="text-muted">
+                      Already have an account?{' '}
+                      <Link to="/login">Sign in</Link>
+                    </small>
                   </div>
                 </CForm>
               </CCardBody>
@@ -177,4 +190,3 @@ const Register = () => {
 }
 
 export default Register
- // Adjust the import path as necessary

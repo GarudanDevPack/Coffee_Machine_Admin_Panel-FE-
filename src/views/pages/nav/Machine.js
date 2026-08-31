@@ -52,7 +52,7 @@ const Machines = () => {
   const getData = async () => {
     try {
       const result = await dispatch(fetchMachines())
-      setData(result)
+      setData(Array.isArray(result) ? result : [])
     } catch (error) {
       console.error(error)
     }
